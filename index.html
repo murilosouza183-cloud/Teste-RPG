@@ -3,18 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quest Financeira - RPG de Boletos</title>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <title>Moonlight Ledger - RPG Financeiro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #12131f;
-      --bg-panel: #1e2036;
-      --border-light: #f4f4f4;
-      --gold: #ffd700;
-      --hp-red: #ff3860;
-      --mp-blue: #209cee;
-      --xp-green: #23d160;
-      --purple-epic: #b86bff;
+      --bg-night: #141824;
+      --bg-wood: #232130;
+      --bg-card: #2c293d;
+      --wood-border: #4a3e59;
+      --gold-warm: #ffcf5c;
+      --gold-glow: rgba(255, 207, 92, 0.35);
+      --teal-magic: #3cd6b5;
+      --teal-glow: rgba(60, 214, 181, 0.3);
+      --crimson-boss: #ff5768;
+      --mana-blue: #4da6ff;
+      --text-cream: #f9f4eb;
+      --text-muted: #b5adc9;
     }
 
     * {
@@ -25,344 +29,374 @@
     }
 
     body {
-      background-color: var(--bg-dark);
-      color: #fff;
-      font-family: 'VT323', monospace;
-      font-size: 20px;
-      padding-bottom: 80px;
+      background: radial-gradient(circle at top, #1f273d 0%, var(--bg-night) 70%);
+      color: var(--text-cream);
+      font-family: 'Quicksand', sans-serif;
+      font-size: 16px;
+      padding-bottom: 95px;
+      min-height: 100vh;
       overflow-x: hidden;
     }
 
-    h1, h2, h3, .pixel-font {
-      font-family: 'Press Start 2P', cursive;
-      text-transform: uppercase;
+    h1, h2, h3, .title-font {
+      font-family: 'Fredoka', sans-serif;
+      letter-spacing: 0.4px;
     }
 
-    /* Moldura estilo RPG Clássico */
-    .rpg-box {
-      background: var(--bg-panel);
-      border: 4px solid var(--border-light);
-      box-shadow: 
-        inset -4px -4px 0px 0px #0d0e1a,
-        inset 4px 4px 0px 0px #3a3f66,
-        0 6px 0 #000;
-      padding: 16px;
-      margin-bottom: 18px;
-      position: relative;
-    }
-
-    .container {
-      max-width: 780px;
-      margin: 0 auto;
-      padding: 12px;
-    }
-
-    /* HUD Fixo no Topo */
+    /* HUD estilo Moonlighter (Arredondado, orgânico e aconchegante) */
     .hud-top {
       position: sticky;
       top: 0;
       z-index: 100;
-      background: #0d0e1a;
-      border-bottom: 4px solid var(--gold);
-      padding: 10px 14px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.7);
+      background: rgba(24, 23, 36, 0.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 2px solid var(--wood-border);
+      padding: 12px 16px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.45);
     }
 
     .hud-grid {
-      max-width: 780px;
+      max-width: 820px;
       margin: 0 auto;
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(165px, 1fr));
+      gap: 12px;
       align-items: center;
     }
 
-    .stat-row {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
+    .stat-pill {
+      background: #1b1926;
+      border: 2px solid #38324a;
+      border-radius: 14px;
+      padding: 7px 12px;
     }
 
-    .stat-label {
-      font-family: 'Press Start 2P', cursive;
-      font-size: 10px;
+    .stat-header {
       display: flex;
       justify-content: space-between;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 5px;
+      color: var(--text-muted);
     }
 
-    .bar-bg {
+    .bar-track {
       width: 100%;
-      height: 14px;
-      background: #000;
-      border: 2px solid #fff;
-      position: relative;
+      height: 10px;
+      background: #110f18;
+      border-radius: 99px;
+      overflow: hidden;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
     }
 
     .bar-fill {
       height: 100%;
-      transition: width 0.3s ease;
+      border-radius: 99px;
+      transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
-    .hp-fill { background: var(--hp-red); }
-    .mp-fill { background: var(--mp-blue); }
-    .xp-fill { background: var(--gold); }
+    .hp-fill { background: linear-gradient(90deg, #ff4b6e, #ff7b6b); box-shadow: 0 0 10px rgba(255, 87, 104, 0.5); }
+    .mp-fill { background: linear-gradient(90deg, #3a8dff, #42e3ff); box-shadow: 0 0 10px rgba(77, 166, 255, 0.5); }
+    .xp-fill { background: linear-gradient(90deg, #2bc49a, var(--teal-magic)); box-shadow: 0 0 10px var(--teal-glow); }
 
-    .gold-badge {
-      font-family: 'Press Start 2P', cursive;
-      font-size: 12px;
-      color: var(--gold);
-      text-align: right;
+    .pouch-badge {
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      gap: 8px;
+      gap: 10px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 16px;
+      color: var(--gold-warm);
     }
 
-    /* Acampamento do Guardião */
-    .sanctuary {
-      background: linear-gradient(180deg, #161936 0%, #242b4d 75%, #1d3a2a 75%, #14261c 100%);
-      min-height: 230px;
+    .container {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    /* Cartões estilo Empório / Madeira Aconchegante */
+    .cozy-card {
+      background: linear-gradient(180deg, #2d293e 0%, #232030 100%);
+      border: 2px solid var(--wood-border);
+      border-radius: 22px;
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08);
+      position: relative;
+    }
+
+    /* Cenário Estilo Moonlighter (Empório Iluminado) */
+    .emporium-scene {
+      background: radial-gradient(circle at 50% 65%, #3d3352 0%, #221e33 55%, #161424 100%);
+      min-height: 270px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
-      position: relative;
       overflow: hidden;
+      border: 2px solid #594a6e;
     }
 
-    .aura-effect {
+    /* Luz de Lampião Quente */
+    .lantern-glow {
       position: absolute;
-      width: 130px;
-      height: 130px;
-      border-radius: 50%;
-      top: 45px;
-      filter: blur(18px);
-      opacity: 0;
-      transition: all 0.5s ease;
+      width: 240px;
+      height: 240px;
+      background: radial-gradient(circle, rgba(255, 195, 85, 0.22) 0%, rgba(60, 214, 181, 0.08) 50%, transparent 75%);
+      top: 30px;
       pointer-events: none;
+      animation: pulseGlow 3.5s infinite ease-in-out;
     }
 
-    .dialog-bubble {
-      background: #fff;
-      color: #000;
-      border: 3px solid #000;
-      padding: 8px 12px;
-      font-family: 'Press Start 2P', cursive;
-      font-size: 10px;
-      line-height: 1.5;
-      max-width: 90%;
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1); opacity: 0.85; }
+      50% { transform: scale(1.12); opacity: 1; }
+    }
+
+    .speech-scroll {
+      background: #fdf6e7;
+      color: #2c221e;
+      padding: 10px 18px;
+      border-radius: 16px;
+      border: 3px solid #d4b88c;
+      font-weight: 700;
+      font-size: 14px;
+      max-width: 92%;
       text-align: center;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.35);
       z-index: 5;
-      box-shadow: 4px 4px 0 rgba(0,0,0,0.5);
+      position: relative;
     }
 
     .stage-floor {
       display: flex;
       align-items: flex-end;
       justify-content: center;
-      gap: 24px;
+      gap: 32px;
       width: 100%;
-      padding: 10px 0;
+      padding: 12px 0 4px;
       z-index: 5;
+      border-bottom: 4px solid #352c47;
     }
 
-    .guardian-sprite {
-      width: 110px;
-      height: 110px;
-      animation: floatIdle 1.6s infinite ease-in-out;
-    }
-
-    .decor-slot {
-      width: 64px;
-      height: 64px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
+    .guardian-wrapper {
+      width: 135px;
+      height: 135px;
       position: relative;
+      animation: breathe 2.6s infinite ease-in-out;
+      filter: drop-shadow(0 10px 12px rgba(0,0,0,0.5));
     }
 
-    .forge-badge {
-      position: absolute;
-      bottom: -8px;
-      background: #000;
-      color: var(--gold);
-      border: 1px solid var(--gold);
-      font-family: 'Press Start 2P', cursive;
-      font-size: 8px;
-      padding: 2px 4px;
+    @keyframes breathe {
+      0%, 100% { transform: translateY(0px) scale(1); }
+      50% { transform: translateY(-7px) scale(1.02); }
     }
 
-    @keyframes floatIdle {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-6px); }
+    .decor-prop {
+      width: 82px;
+      height: 82px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      position: relative;
+      filter: drop-shadow(0 6px 8px rgba(0,0,0,0.45));
     }
 
-    /* Abas de Navegação */
+    .lvl-tag {
+      background: #1a1726;
+      color: var(--gold-warm);
+      border: 1.5px solid var(--gold-warm);
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      margin-top: -6px;
+    }
+
+    /* Botões Orgânicos */
     .nav-tabs {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-bottom: 16px;
+      gap: 10px;
+      margin-bottom: 18px;
     }
 
-    .btn-rpg {
-      background: #2e325c;
-      color: #fff;
-      border: 3px solid #fff;
-      padding: 10px 8px;
-      font-family: 'Press Start 2P', cursive;
-      font-size: 10px;
+    .btn-cozy {
+      background: #332e47;
+      color: var(--text-cream);
+      border: 2px solid #52486e;
+      border-radius: 14px;
+      padding: 11px 14px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 14px;
       cursor: pointer;
-      box-shadow: 0 4px 0 #000;
-      transition: transform 0.1s;
+      box-shadow: 0 4px 0 #1b1826;
+      transition: all 0.15s ease;
     }
 
-    .btn-rpg:active {
-      transform: translateY(4px);
-      box-shadow: 0 0 0 #000;
+    .btn-cozy:hover {
+      filter: brightness(1.08);
     }
 
-    .btn-rpg.active {
-      background: var(--gold);
-      color: #000;
-      border-color: #fff;
+    .btn-cozy:active {
+      transform: translateY(3px);
+      box-shadow: 0 1px 0 #1b1826;
     }
 
-    .btn-pay {
-      background: var(--xp-green);
-      color: #000;
+    .btn-cozy.active {
+      background: linear-gradient(180deg, #47d6b6 0%, #29a389 100%);
+      color: #0e241f;
+      border-color: #8bf5dc;
+      box-shadow: 0 4px 0 #16594a, 0 0 15px var(--teal-glow);
     }
 
     .btn-gold {
-      background: var(--gold);
-      color: #000;
+      background: linear-gradient(180deg, #ffd875 0%, #f0a92e 100%);
+      color: #2b1d03;
+      border-color: #ffeaad;
+      box-shadow: 0 4px 0 #8c5d0b;
     }
 
-    /* Inputs e Formulário */
+    .btn-strike {
+      background: linear-gradient(180deg, #47d6b6 0%, #29a389 100%);
+      color: #0e241f;
+      border-color: #8bf5dc;
+      box-shadow: 0 4px 0 #16594a;
+    }
+
+    /* Inputs Suaves */
     .form-grid {
       display: grid;
       grid-template-columns: 2fr 1fr 1fr auto;
-      gap: 8px;
-      margin-bottom: 14px;
+      gap: 10px;
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 620px) {
       .form-grid { grid-template-columns: 1fr; }
     }
 
-    input, select {
-      background: #0d0e1a;
-      border: 2px solid #fff;
-      color: #fff;
-      padding: 8px;
-      font-family: 'VT323', monospace;
-      font-size: 20px;
+    input {
+      background: #191724;
+      border: 2px solid #453c5c;
+      border-radius: 12px;
+      color: var(--text-cream);
+      padding: 10px 14px;
+      font-family: 'Quicksand', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      outline: none;
     }
 
-    /* Cards de Boletos / Monstros */
-    .monster-card {
-      background: #15172b;
-      border: 3px solid #4a5080;
-      padding: 12px;
-      margin-bottom: 10px;
+    input:focus {
+      border-color: var(--teal-magic);
+      box-shadow: 0 0 10px var(--teal-glow);
+    }
+
+    /* Monstros da Masmorra (Boletos) */
+    .monster-row {
+      background: #1f1c2e;
+      border: 2px solid #3c3554;
+      border-radius: 18px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      transition: all 0.2s;
-    }
-
-    .monster-card.boss {
-      border-color: var(--hp-red);
-      background: linear-gradient(90deg, #2b111c 0%, #15172b 100%);
-    }
-
-    .monster-info {
-      display: flex;
-      align-items: center;
       gap: 14px;
-      flex: 1;
+      transition: all 0.25s ease;
     }
 
-    .monster-icon {
-      width: 52px;
-      height: 52px;
+    .monster-row.boss {
+      background: linear-gradient(90deg, rgba(255, 87, 104, 0.16) 0%, #1f1c2e 100%);
+      border-color: var(--crimson-boss);
+      box-shadow: 0 0 18px rgba(255, 87, 104, 0.15);
+    }
+
+    .monster-avatar {
+      width: 62px;
+      height: 62px;
       flex-shrink: 0;
+      filter: drop-shadow(0 5px 8px rgba(0,0,0,0.4));
+      animation: floatMonster 2.2s infinite ease-in-out;
     }
 
-    .boss-tag {
-      background: var(--hp-red);
+    @keyframes floatMonster {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-4px); }
+    }
+
+    .boss-pill {
+      background: var(--crimson-boss);
       color: #fff;
-      font-family: 'Press Start 2P', cursive;
-      font-size: 8px;
-      padding: 3px 6px;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 11px;
+      padding: 3px 9px;
+      border-radius: 99px;
       display: inline-block;
       margin-bottom: 4px;
     }
 
-    /* Animação de Dano quando paga boleto */
-    .hit-anim {
-      animation: monsterHit 0.45s ease forwards;
+    .hit-effect {
+      animation: vanishHit 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) forwards;
     }
 
-    @keyframes monsterHit {
-      0% { transform: translateX(0); filter: brightness(1); }
-      20% { transform: translateX(-10px) scale(1.05); filter: brightness(5) invert(1); }
-      40% { transform: translateX(10px); }
-      60% { transform: translateX(-6px); opacity: 0.5; }
-      100% { transform: scale(0); opacity: 0; }
+    @keyframes vanishHit {
+      0% { transform: scale(1); }
+      30% { transform: scale(1.06) rotate(-2deg); filter: brightness(2.5); }
+      100% { transform: scale(0.5); opacity: 0; }
     }
 
-    /* Texto Flutuante de XP e Crítico */
-    .floating-xp {
+    .floating-reward {
       position: fixed;
-      font-family: 'Press Start 2P', cursive;
-      font-size: 13px;
-      color: var(--gold);
-      text-shadow: 2px 2px 0 #000;
+      font-family: 'Fredoka', sans-serif;
+      font-size: 16px;
+      color: var(--gold-warm);
+      text-shadow: 0 3px 8px rgba(0,0,0,0.8);
       pointer-events: none;
       z-index: 9999;
-      animation: floatUp 1.2s ease-out forwards;
+      animation: floatUpSmooth 1.2s ease-out forwards;
     }
 
-    @keyframes floatUp {
+    @keyframes floatUpSmooth {
       0% { opacity: 1; transform: translateY(0) scale(0.9); }
-      50% { transform: translateY(-35px) scale(1.1); }
-      100% { opacity: 0; transform: translateY(-70px) scale(1); }
+      50% { transform: translateY(-35px) scale(1.08); }
+      100% { opacity: 0; transform: translateY(-65px) scale(1); }
     }
 
-    /* Grid da Taverna */
     .shop-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-      gap: 12px;
-      margin-top: 12px;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 14px;
+      margin-top: 14px;
     }
 
-    .shop-item {
-      background: #141629;
-      border: 2px solid #596096;
-      padding: 12px;
+    .shop-card {
+      background: #1b1829;
+      border: 2px solid #3c3554;
+      border-radius: 18px;
+      padding: 16px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 10px;
+      gap: 12px;
     }
 
-    /* Rodapé Modo Dev */
-    .dev-bar {
+    .dev-footer {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      background: #090a12;
-      border-top: 2px dashed #555;
-      padding: 8px 14px;
+      background: rgba(17, 15, 26, 0.95);
+      backdrop-filter: blur(8px);
+      border-top: 2px solid #38314d;
+      padding: 10px 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       z-index: 200;
-      font-size: 16px;
+      font-size: 14px;
     }
 
     .hidden { display: none; }
@@ -370,154 +404,145 @@
 </head>
 <body>
 
-  <!-- HUD FIXO -->
+  <!-- HUD TOPO ESTILO MOONLIGHTER -->
   <header class="hud-top">
     <div class="hud-grid">
-      <div class="stat-row">
-        <div class="stat-label">
-          <span>HP (ORÇAMENTO)</span>
+      <div class="stat-pill">
+        <div class="stat-header">
+          <span>❤️ VITALIDADE (ORÇAMENTO)</span>
           <span id="hp-text">100%</span>
         </div>
-        <div class="bar-bg"><div id="hp-bar" class="bar-fill hp-fill" style="width: 100%;"></div></div>
+        <div class="bar-track"><div id="hp-bar" class="bar-fill hp-fill" style="width: 100%;"></div></div>
       </div>
 
-      <div class="stat-row">
-        <div class="stat-label">
-          <span>MANA (RESERVA)</span>
-          <span id="mp-text">R$ 0</span>
+      <div class="stat-pill">
+        <div class="stat-header">
+          <span>💧 ÉTER / RESERVA</span>
+          <span id="mp-text">R$ 300</span>
         </div>
-        <div class="bar-bg"><div id="mp-bar" class="bar-fill mp-fill" style="width: 25%;"></div></div>
+        <div class="bar-track"><div id="mp-bar" class="bar-fill mp-fill" style="width: 25%;"></div></div>
       </div>
 
-      <div class="stat-row">
-        <div class="stat-label">
-          <span id="lvl-text">LVL 1</span>
+      <div class="stat-pill">
+        <div class="stat-header">
+          <span id="lvl-text" style="color: var(--teal-magic);">NÍVEL 1</span>
           <span id="xp-text">0/100 XP</span>
         </div>
-        <div class="bar-bg"><div id="xp-bar" class="bar-fill xp-fill" style="width: 0%;"></div></div>
+        <div class="bar-track"><div id="xp-bar" class="bar-fill xp-fill" style="width: 0%;"></div></div>
       </div>
 
-      <div class="gold-badge">
-        <span id="elixir-indicator" style="color: var(--purple-epic); font-size: 9px;"></span>
-        <span>🪙 <span id="gold-text">50</span> GOLD</span>
-        <button id="mute-btn" class="btn-rpg" style="padding: 4px 6px;" onclick="toggleMute()">🔊</button>
+      <div class="pouch-badge">
+        <span id="elixir-badge" style="color: var(--teal-magic); font-size: 12px;"></span>
+        <span>🪙 <span id="gold-text">100</span></span>
+        <button id="mute-btn" class="btn-cozy" style="padding: 6px 10px;" onclick="toggleMute()">🔊</button>
       </div>
     </div>
   </header>
 
   <div class="container">
 
-    <!-- ACAMPAMENTO DO GUARDIÃO -->
-    <section class="rpg-box sanctuary">
-      <div id="guardian-aura" class="aura-effect"></div>
+    <!-- SANTUÁRIO / EMPÓRIO DO MERCADOR GUARDIÃO -->
+    <section class="cozy-card emporium-scene">
+      <div id="lantern-aura" class="lantern-glow"></div>
 
-      <div style="width: 100%; display: flex; justify-content: space-between; font-size: 16px; z-index: 5;">
-        <span id="class-title" class="pixel-font" style="font-size: 10px; color: var(--gold);">CLASSE: APRENDIZ DE BOLETOS</span>
-        <span id="noble-title" style="color: #b86bff;">Título: Aldeão Sem Trocado</span>
+      <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
+        <span id="class-title" class="title-font" style="color: var(--gold-warm); font-size: 15px;">Mercador Aprendiz de Rynoka</span>
+        <span id="noble-title" style="background: rgba(60, 214, 181, 0.15); color: var(--teal-magic); padding: 4px 12px; border-radius: 99px; font-size: 13px; font-weight: 700;">Guardador de Moedas</span>
       </div>
 
-      <div id="guardian-speech" class="dialog-bubble">
-        "Pague uma conta antes do vencimento para dar DANO CRÍTICO (2x XP)!"
+      <div id="guardian-speech" class="speech-scroll">
+        "Bem-vindo ao Empório! Derrote um boleto antes do vencimento para causar Acerto Crítico!"
       </div>
 
       <div class="stage-floor">
-        <!-- Slot Esquerdo (Fogueira) -->
-        <div class="decor-slot" id="slot-campfire"></div>
+        <!-- Slot Esquerdo: Caldeirão / Lampião Alquímico -->
+        <div class="decor-prop" id="slot-lantern"></div>
 
-        <!-- O Gato Guardião Evolutivo -->
-        <div class="guardian-sprite" id="guardian-svg-container"></div>
+        <!-- Guardião Ilustrado com Curvas Suaves (Não Quadrado!) -->
+        <div class="guardian-wrapper" id="guardian-art"></div>
 
-        <!-- Slot Direito (Baú) -->
-        <div class="decor-slot" id="slot-chest"></div>
+        <!-- Slot Direito: Baú Relíquia de Rynoka -->
+        <div class="decor-prop" id="slot-chest"></div>
       </div>
     </section>
 
     <!-- NAVEGAÇÃO -->
     <nav class="nav-tabs">
-      <button class="btn-rpg active" id="tab-btn-dungeon" onclick="switchTab('dungeon')">⚔️ MASMORRA (CONTAS)</button>
-      <button class="btn-rpg" id="tab-btn-tavern" onclick="switchTab('tavern')">🍺 TAVERNA & FORJA</button>
-      <button class="btn-rpg" id="tab-btn-stats" onclick="switchTab('stats')">📜 ORÇAMENTO & MANA</button>
+      <button class="btn-cozy active" id="tab-btn-dungeon" onclick="switchTab('dungeon')">🗡️ Masmorra (Contas)</button>
+      <button class="btn-cozy" id="tab-btn-tavern" onclick="switchTab('tavern')">🏮 Empório & Forja</button>
+      <button class="btn-cozy" id="tab-btn-stats" onclick="switchTab('stats')">📖 Livro-Caixa & Éter</button>
     </nav>
 
-    <!-- ABA 1: MASMORRA DE BOLETOS -->
+    <!-- ABA 1: MASMORRA -->
     <main id="tab-dungeon">
-      <div class="rpg-box">
-        <h3 style="font-size: 12px; margin-bottom: 12px; color: var(--gold);">INVOCAR NOVO BOLETO (CONTA)</h3>
+      <div class="cozy-card">
+        <h3 style="font-size: 16px; color: var(--gold-warm); margin-bottom: 12px;">Registrar Nova Conta na Masmorra</h3>
         <div class="form-grid">
-          <input type="text" id="bill-name" placeholder="Ex: Fatura Cartão, Internet...">
+          <input type="text" id="bill-name" placeholder="Nome da conta (ex: Cartão, Luz)...">
           <input type="number" id="bill-amount" placeholder="Valor (R$)">
           <input type="date" id="bill-due">
-          <button class="btn-rpg btn-gold" onclick="addBill()">+ INVOCAR</button>
+          <button class="btn-cozy btn-gold" onclick="addBill()">+ Adicionar</button>
         </div>
       </div>
 
-      <div class="rpg-box">
-        <h3 style="font-size: 12px; margin-bottom: 12px;">MONSTROS DO MÊS ATUAL</h3>
+      <div class="cozy-card">
+        <h3 style="font-size: 16px; margin-bottom: 14px;">Criaturas da Masmorra (Contas Pendentes)</h3>
         <div id="monsters-list"></div>
       </div>
     </main>
 
-    <!-- ABA 2: TAVERNA DE LOOT INFINITA -->
+    <!-- ABA 2: EMPÓRIO & FORJA -->
     <section id="tab-tavern" class="hidden">
-      <!-- Forja e Decoração -->
-      <div class="rpg-box">
-        <h3 style="font-size: 12px; color: var(--gold);">⚒️ FORJA & ACAMPAMENTO (UPGRADE INFINITO)</h3>
-        <p style="color: #ccc; margin-top: 4px;">Suba o nível dos itens para mudar o brilho e a cor deles no seu cenário!</p>
+      <div class="cozy-card">
+        <h3 style="font-size: 16px; color: var(--gold-warm);">⚒️ Oficina do Ferreiro (Evolução Infinita do Cenário)</h3>
+        <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">Aprimore as relíquias do seu empório para mudar suas chamas e cristais mágicos.</p>
         <div class="shop-grid" id="forge-list"></div>
       </div>
 
-      <!-- Consumíveis e Gacha -->
-      <div class="rpg-box">
-        <h3 style="font-size: 12px; color: var(--purple-epic);">🧪 ALQUIMIA & BAÚ GACHA</h3>
+      <div class="cozy-card">
+        <h3 style="font-size: 16px; color: var(--teal-magic);">🧪 Alquimia da Bruxa & Relíquias</h3>
         <div class="shop-grid">
-          <div class="shop-item">
+          <div class="shop-card">
             <div>
-              <strong class="pixel-font" style="font-size: 10px; color: #23d160;">ELIXIR DE SABEDORIA</strong>
-              <p style="margin-top: 6px;">Dobra o XP (2x) dos próximos 3 boletos derrotados!</p>
+              <strong class="title-font" style="color: var(--teal-magic);">Poção do Luar (2x XP)</strong>
+              <p style="color: var(--text-muted); font-size: 14px; margin-top: 6px;">Dobra a experiência ganha nas próximas 3 contas pagas.</p>
             </div>
-            <button class="btn-rpg btn-gold" onclick="buyElixir()">COMPRAR (80 GOLD)</button>
+            <button class="btn-cozy btn-gold" onclick="buyElixir()">Comprar (80 🪙)</button>
           </div>
 
-          <div class="shop-item">
+          <div class="shop-card">
             <div>
-              <strong class="pixel-font" style="font-size: 10px; color: var(--mp-blue);">POÇÃO DE ESCUDO</strong>
-              <p style="margin-top: 6px;">Restaura +25% do seu HP financeiro na hora.</p>
+              <strong class="title-font" style="color: var(--mana-blue);">Bálsamo Restaurador</strong>
+              <p style="color: var(--text-muted); font-size: 14px; margin-top: 6px;">Recupera +25% da Vitalidade do seu orçamento mensal.</p>
             </div>
-            <button class="btn-rpg btn-gold" onclick="buyHeal()">COMPRAR (60 GOLD)</button>
+            <button class="btn-cozy btn-gold" onclick="buyHeal()">Comprar (60 🪙)</button>
           </div>
 
-          <div class="shop-item" style="border-color: var(--purple-epic);">
+          <div class="shop-card" style="border-color: var(--gold-warm);">
             <div>
-              <strong class="pixel-font" style="font-size: 10px; color: var(--purple-epic);">🎁 BAÚ MISTERIOSO (GACHA)</strong>
-              <p style="margin-top: 6px;">Sorteia Auras Místicas e Títulos Raros ou Lendários!</p>
+              <strong class="title-font" style="color: var(--gold-warm);">✨ Cofre do Viajante (Sorteio)</strong>
+              <p style="color: var(--text-muted); font-size: 14px; margin-top: 6px;">Desbloqueia Títulos Raros e Auras de Luz para o seu Guardião!</p>
             </div>
-            <button class="btn-rpg" style="background: var(--purple-epic); color: #000;" onclick="rollGacha()">ABRIR (150 GOLD)</button>
+            <button class="btn-cozy btn-strike" onclick="rollGacha()">Abrir Cofre (150 🪙)</button>
           </div>
         </div>
       </div>
-
-      <!-- Mercador Viajante Semanal -->
-      <div class="rpg-box" style="border-color: var(--gold);">
-        <h3 style="font-size: 12px; color: var(--gold);">⛺ MERCADOR VIAJANTE (ROTAÇÃO DA SEMANA)</h3>
-        <p style="color: #aaa; margin-top: 4px;" id="merchant-timer"></p>
-        <div class="shop-grid" id="merchant-list"></div>
-      </div>
     </section>
 
-    <!-- ABA 3: ORÇAMENTO & RESERVA (MANA) -->
+    <!-- ABA 3: LIVRO-CAIXA -->
     <section id="tab-stats" class="hidden">
-      <div class="rpg-box">
-        <h3 style="font-size: 12px; color: var(--gold); margin-bottom: 12px;">CONFIGURAR RENDA E RESERVA DE MANA</h3>
-        <div style="display: grid; gap: 12px;">
+      <div class="cozy-card">
+        <h3 style="font-size: 16px; color: var(--gold-warm); margin-bottom: 12px;">Configurar Orçamento & Reserva de Éter</h3>
+        <div style="display: grid; gap: 14px;">
           <div>
-            <label>Orçamento Mensal Total (R$):</label><br>
-            <input type="number" id="input-budget" style="width: 100%; margin-top: 4px;" onchange="updateFinanceConfig()">
+            <label style="font-weight: 700;">Renda / Orçamento Mensal (R$):</label>
+            <input type="number" id="input-budget" style="width: 100%; margin-top: 6px;" onchange="updateFinanceConfig()">
           </div>
           <div>
-            <label>Guardar na Reserva / Poupança (Aumenta MANA e dá XP):</label>
-            <div style="display: flex; gap: 8px; margin-top: 4px;">
-              <input type="number" id="input-mana-add" placeholder="Valor guardado (R$)" style="flex: 1;">
-              <button class="btn-rpg" style="background: var(--mp-blue);" onclick="addManaSavings()">+ CANALIZAR MANA</button>
+            <label style="font-weight: 700;">Guardar na Reserva (Aumenta seu Éter e concede XP):</label>
+            <div style="display: flex; gap: 10px; margin-top: 6px;">
+              <input type="number" id="input-mana-add" placeholder="Valor poupado (R$)" style="flex: 1;">
+              <button class="btn-cozy btn-strike" onclick="addManaSavings()">+ Guardar Éter</button>
             </div>
           </div>
         </div>
@@ -526,47 +551,46 @@
 
   </div>
 
-  <!-- RODAPÉ MODO DEV PARA TESTE IMEDIATO -->
-  <footer class="dev-bar">
-    <span>🛠️ <strong>MODO TESTE:</strong> Clique ao lado para testar todas as evoluções agora!</span>
+  <!-- BARRA DE TESTE RÁPIDO -->
+  <footer class="dev-footer">
+    <span>✨ <strong>Teste de Evolução:</strong> Veja o Guardião ganhar novos trajes, espada mágica e chapéu!</span>
     <div style="display: flex; gap: 8px;">
-      <button class="btn-rpg btn-gold" onclick="devBoost()">⚡ +120 XP / +250 GOLD</button>
-      <button class="btn-rpg" style="background: #ff3860;" onclick="resetGame()">RESET</button>
+      <button class="btn-cozy btn-gold" onclick="devBoost()">+120 XP / +250 🪙</button>
+      <button class="btn-cozy" style="background: #ff5768; color: #fff; border:none;" onclick="resetGame()">Resetar</button>
     </div>
   </footer>
 
   <script>
-    // ================= ESTADO DO JOGO (SALVO NO LOCALSTORAGE) =================
     const defaultState = {
       xp: 0,
       level: 1,
-      gold: 100,
+      gold: 120,
       budget: 3500,
-      manaSaved: 300,
+      manaSaved: 350,
       hpBonus: 0,
       elixirCharges: 0,
-      nobleTitle: "Aldeão Sem Trocado",
-      auraColor: "transparent",
+      nobleTitle: "Guardador de Moedas",
+      auraColor: "rgba(255, 195, 85, 0.25)",
       muted: false,
       forge: {
-        campfire: { level: 0, name: "Fogueira Mística", baseCost: 50 },
-        chest: { level: 0, name: "Baú do Tesouro", baseCost: 80 }
+        lantern: { level: 0, name: "Lampião de Éter", baseCost: 50 },
+        chest: { level: 0, name: "Arca de Rynoka", baseCost: 80 }
       },
       bills: [
-        { id: 1, name: "Fatura do Cartão", amount: 1250, due: "2026-11-20", paid: false },
+        { id: 1, name: "Fatura do Cartão (Golem)", amount: 1250, due: "2026-11-20", paid: false },
         { id: 2, name: "Internet Fibra", amount: 120, due: "2026-11-15", paid: false },
-        { id: 3, name: "Conta de Luz", amount: 185, due: "2026-11-10", paid: false }
+        { id: 3, name: "Energia Elétrica", amount: 185, due: "2026-11-10", paid: false }
       ]
     };
 
-    let state = JSON.parse(localStorage.getItem("rpg_finance_state")) || defaultState;
+    let state = JSON.parse(localStorage.getItem("moonlight_finance_state")) || defaultState;
 
     function saveState() {
-      localStorage.setItem("rpg_finance_state", JSON.stringify(state));
+      localStorage.setItem("moonlight_finance_state", JSON.stringify(state));
       renderAll();
     }
 
-    // ================= WEB AUDIO API (SONS 8-BIT PUROS) =================
+    // Sons suaves estilo RPG Indie (Acordes de Harpa/Cristal)
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     let audioCtx;
 
@@ -575,48 +599,19 @@
       if (!audioCtx) audioCtx = new AudioCtx();
       const now = audioCtx.currentTime;
 
-      if (type === "attack") {
-        // Som de golpe + moeda
-        [260, 520, 780].forEach((freq, idx) => {
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          osc.type = "square";
-          osc.frequency.setValueAtTime(freq, now + idx * 0.06);
-          gain.gain.setValueAtTime(0.12, now + idx * 0.06);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + (idx + 1) * 0.08);
-          osc.connect(gain);
-          gain.connect(audioCtx.destination);
-          osc.start(now + idx * 0.06);
-          osc.stop(now + (idx + 1) * 0.08);
-        });
-      } else if (type === "levelup") {
-        // Fanfarra clássica de RPG
-        const notes = [330, 392, 659, 523, 587, 784];
-        notes.forEach((freq, idx) => {
-          const osc = audioCtx.createOscillator();
-          const gain = audioCtx.createGain();
-          osc.type = "triangle";
-          osc.frequency.setValueAtTime(freq, now + idx * 0.09);
-          gain.gain.setValueAtTime(0.2, now + idx * 0.09);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + (idx + 1) * 0.12);
-          osc.connect(gain);
-          gain.connect(audioCtx.destination);
-          osc.start(now + idx * 0.09);
-          osc.stop(now + (idx + 1) * 0.12);
-        });
-      } else if (type === "buy") {
+      const notes = type === "levelup" ? [392, 493.88, 587.33, 783.99] : [523.25, 659.25, 783.99];
+      notes.forEach((freq, idx) => {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.type = "sine";
-        osc.frequency.setValueAtTime(587, now);
-        osc.frequency.setValueAtTime(880, now + 0.07);
-        gain.gain.setValueAtTime(0.15, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+        osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+        gain.gain.setValueAtTime(0.15, now + idx * 0.08);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + (idx + 1) * 0.18);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
-        osc.start(now);
-        osc.stop(now + 0.2);
-      }
+        osc.start(now + idx * 0.08);
+        osc.stop(now + (idx + 1) * 0.18);
+      });
     }
 
     function toggleMute() {
@@ -625,113 +620,142 @@
       saveState();
     }
 
-    // ================= ARTES EM PIXEL ART (SVG) =================
-    function getGuardianSVG(level) {
-      const hasSword = level >= 3;
-      const isMage = level >= 6;
+    // ================= ILUSTRAÇÃO ORGÂNICA ESTILO MOONLIGHTER (NÃO QUADRADA!) =================
+    function getGuardianIllustration(level) {
+      const hasRelicSword = level >= 3;
+      const isMasterMerchant = level >= 6;
 
       return `
-      <svg viewBox="0 0 16 16" width="100%" height="100%" shape-rendering="crispEdges">
-        <!-- Espada nas costas (Nível 3+) -->
-        ${hasSword ? `
-          <rect x="2" y="2" width="2" height="2" fill="#ffd700"/>
-          <rect x="3" y="4" width="2" height="7" fill="#d0d0e0"/>
+      <svg viewBox="0 0 140 140" width="100%" height="100%">
+        <defs>
+          <linearGradient id="cloakGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="${isMasterMerchant ? '#7c3aed' : '#2b9e85'}"/>
+            <stop offset="100%" stop-color="${isMasterMerchant ? '#4c1d95' : '#185c4d'}"/>
+          </linearGradient>
+          <linearGradient id="bladeGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#8bf5dc"/>
+            <stop offset="100%" stop-color="#209cee"/>
+          </linearGradient>
+          <linearGradient id="furGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#2e324a"/>
+            <stop offset="100%" stop-color="#191b29"/>
+          </linearGradient>
+        </defs>
+
+        <!-- Sombra suave no chão -->
+        <ellipse cx="70" cy="128" rx="38" ry="8" fill="rgba(0,0,0,0.45)"/>
+
+        <!-- Espada de Cristal Turquesa nas Costas (Nível 3+) -->
+        ${hasRelicSword ? `
+          <g transform="rotate(-28 70 70)">
+            <path d="M65 8 L70 0 L75 8 L73 75 L67 75 Z" fill="url(#bladeGrad)" stroke="#fff" stroke-width="1.5"/>
+            <rect x="58" y="72" width="24" height="5" rx="2.5" fill="#ffcf5c"/>
+            <circle cx="70" cy="83" r="4.5" fill="#ff5768"/>
+          </g>
         ` : ''}
 
-        <!-- Capa Mística (Nível 6+) -->
-        ${isMage ? `
-          <rect x="3" y="8" width="10" height="6" fill="#7928ca"/>
+        <!-- Mochila de Mercador (Estilo Will de Moonlighter) -->
+        <rect x="34" y="65" width="72" height="44" rx="18" fill="#8c583a" stroke="#4a2c18" stroke-width="2.5"/>
+        <rect x="40" y="58" width="60" height="14" rx="7" fill="#b0724f"/>
+
+        <!-- Capa Orgânica Arredondada -->
+        <path d="M38 72 C32 95, 34 118, 42 124 L98 124 C106 118, 108 95, 102 72 Z" fill="url(#cloakGrad)" stroke="#1b1826" stroke-width="2.5"/>
+
+        <!-- Cachecol Vermelho Aconchegante -->
+        <path d="M46 70 Q70 82 94 70 Q98 79 88 83 Q70 90 52 83 Q42 79 46 70 Z" fill="#ff5768"/>
+        <path d="M78 78 Q86 96 82 108 L92 106 Q96 92 86 76 Z" fill="#e03e50"/>
+
+        <!-- Orelhas Suaves do Gato Guardião -->
+        <path d="M43 48 C40 28, 46 22, 60 36 Z" fill="url(#furGrad)" stroke="#141521" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M46 44 C45 32, 48 29, 56 37 Z" fill="#ff8da1"/>
+        <path d="M97 48 C100 28, 94 22, 80 36 Z" fill="url(#furGrad)" stroke="#141521" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M94 44 C95 32, 92 29, 84 37 Z" fill="#ff8da1"/>
+
+        <!-- Cabeça Arredondada e Fofa -->
+        <ellipse cx="70" cy="54" rx="30" ry="24" fill="url(#furGrad)" stroke="#141521" stroke-width="2.5"/>
+
+        <!-- Olhos Grandes Brilhantes -->
+        <ellipse cx="57" cy="55" rx="6" ry="7" fill="#ffcf5c"/>
+        <circle cx="55" cy="52" r="2.2" fill="#fff"/>
+        <ellipse cx="83" cy="55" rx="6" ry="7" fill="#ffcf5c"/>
+        <circle cx="81" cy="52" r="2.2" fill="#fff"/>
+
+        <!-- Bochechas Rosadas e Focinho Suave -->
+        <ellipse cx="47" cy="61" rx="4" ry="2.2" fill="rgba(255, 115, 140, 0.45)"/>
+        <ellipse cx="93" cy="61" rx="4" ry="2.2" fill="rgba(255, 115, 140, 0.45)"/>
+        <path d="M67 60 Q70 63 73 60" stroke="#ffb3c1" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+
+        <!-- Chapéu Místico de Mercador Lendário (Nível 6+) -->
+        ${isMasterMerchant ? `
+          <path d="M28 38 Q70 26 112 38 Q70 46 28 38 Z" fill="#5b21b6" stroke="#ffcf5c" stroke-width="2"/>
+          <path d="M45 35 C50 12, 68 4, 86 8 C78 18, 88 26, 95 35 Z" fill="#7c3aed" stroke="#ffcf5c" stroke-width="2"/>
+          <circle cx="85" cy="10" r="4" fill="#3cd6b5"/>
         ` : ''}
 
-        <!-- Orelhas e Cabeça do Gato -->
-        <rect x="4" y="3" width="2" height="2" fill="#262b44"/>
-        <rect x="10" y="3" width="2" height="2" fill="#262b44"/>
-        <rect x="4" y="5" width="8" height="6" fill="#262b44"/>
-
-        <!-- Bandana Vermelha de Aprendiz -->
-        <rect x="4" y="5" width="8" height="1" fill="#ff3860"/>
-        <rect x="12" y="6" width="2" height="1" fill="#ff3860"/>
-
-        <!-- Chapéu / Coroa de Mago Supremo (Nível 6+) -->
-        ${isMage ? `
-          <rect x="3" y="3" width="10" height="1" fill="#ffd700"/>
-          <rect x="5" y="1" width="6" height="2" fill="#9b4dff"/>
-          <rect x="7" y="0" width="2" height="1" fill="#ffd700"/>
-        ` : ''}
-
-        <!-- Olhos Brilhantes -->
-        <rect x="5" y="7" width="2" height="2" fill="#ffd700"/>
-        <rect x="9" y="7" width="2" height="2" fill="#ffd700"/>
-        <!-- Focinho -->
-        <rect x="7" y="9" width="2" height="1" fill="#ff99aa"/>
-
-        <!-- Corpo e Patas -->
-        <rect x="5" y="11" width="6" height="4" fill="#262b44"/>
-        <rect x="5" y="14" width="2" height="1" fill="#fff"/>
-        <rect x="9" y="14" width="2" height="1" fill="#fff"/>
-
-        <!-- Escudo Reluzente (Nível 3+) -->
-        ${hasSword ? `
-          <rect x="10" y="10" width="4" height="4" fill="#209cee"/>
-          <rect x="11" y="11" width="2" height="2" fill="#ffd700"/>
+        <!-- Escudo Relíquia de Rynoka (Nível 3+) -->
+        ${hasRelicSword ? `
+          <g transform="translate(76, 82)">
+            <circle cx="16" cy="16" r="15" fill="#2c3e50" stroke="#ffcf5c" stroke-width="3"/>
+            <circle cx="16" cy="16" r="7" fill="#3cd6b5"/>
+          </g>
         ` : ''}
       </svg>`;
     }
 
-    function getMonsterSVG(isBoss) {
+    function getMonsterIllustration(isBoss) {
       if (isBoss) {
-        // Boss Dragão Vermelho
+        // Boss Golem de Rocha & Magma (Estilo Guardião da Masmorra de Moonlighter)
         return `
-        <svg viewBox="0 0 16 16" width="100%" height="100%" shape-rendering="crispEdges">
-          <rect x="2" y="2" width="3" height="2" fill="#ffd700"/>
-          <rect x="11" y="2" width="3" height="2" fill="#ffd700"/>
-          <rect x="3" y="4" width="10" height="9" fill="#ff3860"/>
-          <rect x="1" y="6" width="2" height="5" fill="#990022"/>
-          <rect x="13" y="6" width="2" height="5" fill="#990022"/>
-          <rect x="5" y="6" width="2" height="2" fill="#ffdd00"/>
-          <rect x="9" y="6" width="2" height="2" fill="#ffdd00"/>
-          <rect x="5" y="11" width="6" height="1" fill="#fff"/>
+        <svg viewBox="0 0 80 80" width="100%" height="100%">
+          <ellipse cx="40" cy="72" rx="26" ry="5" fill="rgba(0,0,0,0.4)"/>
+          <path d="M16 58 C12 34, 24 14, 40 14 C56 14, 68 34, 64 58 C60 68, 20 68, 16 58 Z" fill="#3a3347" stroke="#ff5768" stroke-width="2.5"/>
+          <!-- Runas Brilhantes no Golem -->
+          <path d="M32 24 L40 32 L48 24" stroke="#ff5768" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <circle cx="30" cy="42" r="5" fill="#ffcf5c"/>
+          <circle cx="50" cy="42" r="5" fill="#ffcf5c"/>
+          <path d="M28 54 Q40 48 52 54" stroke="#ff5768" stroke-width="3" fill="none" stroke-linecap="round"/>
         </svg>`;
       }
-      // Slime Verde Comum
+      // Slime Gelatina Turquesa Orgânico e Redondinho
       return `
-      <svg viewBox="0 0 16 16" width="100%" height="100%" shape-rendering="crispEdges">
-        <rect x="6" y="4" width="4" height="2" fill="#23d160"/>
-        <rect x="4" y="6" width="8" height="3" fill="#23d160"/>
-        <rect x="2" y="9" width="12" height="5" fill="#23d160"/>
-        <rect x="5" y="9" width="2" height="2" fill="#000"/>
-        <rect x="9" y="9" width="2" height="2" fill="#000"/>
+      <svg viewBox="0 0 80 80" width="100%" height="100%">
+        <ellipse cx="40" cy="68" rx="22" ry="5" fill="rgba(0,0,0,0.35)"/>
+        <path d="M18 52 C18 30, 30 20, 40 20 C50 20, 62 30, 62 52 C62 63, 52 66, 40 66 C28 66, 18 63, 18 52 Z" fill="rgba(60, 214, 181, 0.85)" stroke="#8bf5dc" stroke-width="2.5"/>
+        <!-- Brilho gelatinoso -->
+        <ellipse cx="30" cy="32" rx="6" ry="3.5" transform="rotate(-25 30 32)" fill="rgba(255,255,255,0.65)"/>
+        <circle cx="33" cy="46" r="3.5" fill="#141824"/>
+        <circle cx="47" cy="46" r="3.5" fill="#141824"/>
       </svg>`;
     }
 
-    function getDecorSVG(type, level) {
+    function getDecorIllustration(type, level) {
       if (level <= 0) return "";
-      // Muda a cor da chama/baú conforme o nível na Forja!
-      const flameColors = ["#ff6600", "#209cee", "#b86bff", "#ffd700"];
-      const color = flameColors[(level - 1) % flameColors.length];
+      const colors = ["#ffcf5c", "#3cd6b5", "#b86bff", "#ff5768"];
+      const glow = colors[(level - 1) % colors.length];
 
-      if (type === "campfire") {
+      if (type === "lantern") {
         return `
-        <svg viewBox="0 0 16 16" width="48" height="48" shape-rendering="crispEdges">
-          <rect x="6" y="4" width="4" height="6" fill="${color}"/>
-          <rect x="7" y="2" width="2" height="3" fill="#fff"/>
-          <rect x="3" y="11" width="10" height="3" fill="#8b5a2b"/>
+        <svg viewBox="0 0 70 70" width="60" height="60">
+          <circle cx="35" cy="34" r="24" fill="${glow}" opacity="0.22"/>
+          <path d="M25 18 L45 18 L48 48 L22 48 Z" fill="#252236" stroke="#ffcf5c" stroke-width="2.5" stroke-linejoin="round"/>
+          <circle cx="35" cy="35" r="9" fill="${glow}"/>
+          <path d="M20 50 L50 50" stroke="#8c583a" stroke-width="5" stroke-linecap="round"/>
         </svg>
-        <span class="forge-badge">LVL ${level}</span>`;
+        <span class="lvl-tag">Nv. ${level}</span>`;
       }
       if (type === "chest") {
         return `
-        <svg viewBox="0 0 16 16" width="48" height="48" shape-rendering="crispEdges">
-          <rect x="2" y="5" width="12" height="9" fill="#8b5a2b"/>
-          <rect x="2" y="8" width="12" height="2" fill="${color}"/>
-          <rect x="7" y="7" width="2" height="4" fill="#ffd700"/>
+        <svg viewBox="0 0 70 70" width="60" height="60">
+          <rect x="14" y="24" width="42" height="30" rx="8" fill="#8c583a" stroke="#ffcf5c" stroke-width="2.5"/>
+          <path d="M14 37 L56 37" stroke="#ffcf5c" stroke-width="3"/>
+          <circle cx="35" cy="37" r="6" fill="${glow}" stroke="#fff" stroke-width="1.5"/>
         </svg>
-        <span class="forge-badge">LVL ${level}</span>`;
+        <span class="lvl-tag">Nv. ${level}</span>`;
       }
     }
 
-    // ================= LÓGICA DE COMBATE E XP =================
-    function gainXPAndGold(xpAmount, goldAmount, eventElement, isCrit = false) {
+    // ================= LÓGICA DO JOGO =================
+    function gainXPAndGold(xpAmount, goldAmount, btnEl, isCrit = false) {
       if (state.elixirCharges > 0) {
         xpAmount *= 2;
         state.elixirCharges--;
@@ -740,34 +764,32 @@
       state.xp += xpAmount;
       state.gold += goldAmount;
 
-      // Texto flutuante na tela
-      if (eventElement) {
-        const rect = eventElement.getBoundingClientRect();
+      if (btnEl) {
+        const rect = btnEl.getBoundingClientRect();
         const floatEl = document.createElement("div");
-        floatEl.className = "floating-xp";
-        floatEl.style.left = `${rect.left + 20}px`;
-        floatEl.style.top = `${rect.top}px`;
-        floatEl.innerHTML = `${isCrit ? '⚡ CRÍTICO! ' : ''}+${xpAmount} XP | +${goldAmount} 🪙`;
+        floatEl.className = "floating-reward";
+        floatEl.style.left = `${rect.left}px`;
+        floatEl.style.top = `${rect.top - 10}px`;
+        floatEl.innerHTML = `${isCrit ? '✨ CRÍTICO! ' : ''}+${xpAmount} XP | +${goldAmount} 🪙`;
         document.body.appendChild(floatEl);
         setTimeout(() => floatEl.remove(), 1200);
       }
 
-      // Verifica Level Up
       const xpNeeded = state.level * 100;
       if (state.xp >= xpNeeded) {
         state.xp -= xpNeeded;
         state.level++;
         playSound("levelup");
-        setSpeech(`🎉 LEVEL UP! Alcancei o Nível ${state.level}! Meus equipamentos evoluíram!`);
+        setSpeech(`🌟 Subimos para o Nível ${state.level}! O Empório e meus equipamentos evoluíram!`);
       } else {
-        playSound("attack");
+        playSound("hit");
       }
 
       saveState();
     }
 
-    function setSpeech(text) {
-      document.getElementById("guardian-speech").innerText = `"${text}"`;
+    function setSpeech(msg) {
+      document.getElementById("guardian-speech").innerText = `"${msg}"`;
     }
 
     function addBill() {
@@ -776,8 +798,7 @@
       const due = document.getElementById("bill-due").value;
 
       if (!name || isNaN(amount) || amount <= 0) {
-        setSpeech("Preencha o nome e o valor do boleto para invocá-lo na masmorra!");
-        return;
+        return setSpeech("Preencha o nome e o valor da conta para registrá-la no livro da masmorra!");
       }
 
       state.bills.push({
@@ -790,132 +811,76 @@
 
       document.getElementById("bill-name").value = "";
       document.getElementById("bill-amount").value = "";
-      setSpeech(`Um novo monstro "${name}" apareceu na masmorra!`);
+      setSpeech(`A criatura "${name}" apareceu na masmorra deste mês!`);
       saveState();
     }
 
-    function payBill(id, btnElement) {
+    function payBill(id, btnEl) {
       const bill = state.bills.find(b => b.id === id);
       if (!bill || bill.paid) return;
 
       const card = document.getElementById(`bill-card-${id}`);
-      card.classList.add("hit-anim");
+      card.classList.add("hit-effect");
 
-      // Verifica se pagou adiantado ou em dia (Acerto Crítico!)
       const today = new Date().toISOString().split("T")[0];
       const isEarly = bill.due >= today;
-
-      const baseXP = isEarly ? 80 : 40;
-      const baseGold = isEarly ? 35 : 15;
 
       setTimeout(() => {
         bill.paid = true;
         setSpeech(isEarly
-          ? `⚔️ ACERTO CRÍTICO em "${bill.name}"! Pagou em dia e ganhou XP em dobro!`
-          : `Boleto "${bill.name}" derrotado!`);
-        gainXPAndGold(baseXP, baseGold, btnElement, isEarly);
+          ? `✨ Golpe de Mestre em "${bill.name}"! Conta paga em dia com recompensa dobrada!`
+          : `Criatura "${bill.name}" derrotada com sucesso!`);
+        gainXPAndGold(isEarly ? 80 : 40, isEarly ? 35 : 15, btnEl, isEarly);
       }, 380);
     }
 
-    // ================= TAVERNA, FORJA, GACHA E MERCADOR =================
     function upgradeForge(key) {
       const item = state.forge[key];
       const cost = item.baseCost * (item.level + 1);
-
-      if (state.gold < cost) {
-        setSpeech(`Faltam moedas! Você precisa de ${cost} Gold para forjar esse item.`);
-        return;
-      }
+      if (state.gold < cost) return setSpeech(`Você precisa de ${cost} moedas de ouro para aprimorar ${item.name}!`);
 
       state.gold -= cost;
       item.level++;
-      playSound("buy");
-      setSpeech(`⚒️ Forja concluída! "${item.name}" subiu para o Nível ${item.level}!`);
+      playSound("levelup");
+      setSpeech(`⚒️ "${item.name}" foi aprimorado para o Nível ${item.level} no seu Empório!`);
       saveState();
     }
 
     function buyElixir() {
-      if (state.gold < 80) return setSpeech("Você precisa de 80 Gold para o Elixir!");
+      if (state.gold < 80) return setSpeech("Moedas insuficientes para a Poção do Luar!");
       state.gold -= 80;
       state.elixirCharges += 3;
-      playSound("buy");
-      setSpeech("🧪 Elixir ativado! Seus próximos 3 boletos darão o DOBRO de XP!");
+      playSound("hit");
+      setSpeech("🧪 Poção do Luar ativa! As próximas 3 contas darão o dobro de XP!");
       saveState();
     }
 
     function buyHeal() {
-      if (state.gold < 60) return setSpeech("Você precisa de 60 Gold para a Poção!");
+      if (state.gold < 60) return setSpeech("Moedas insuficientes para o Bálsamo!");
       state.gold -= 60;
       state.hpBonus = Math.min(100, (state.hpBonus || 0) + 25);
-      playSound("buy");
-      setSpeech("💙 Poção tomada! Seu HP mensal foi protegido!");
+      playSound("hit");
+      setSpeech("❤️ Vitalidade do orçamento restaurada com sucesso!");
       saveState();
     }
 
     function rollGacha() {
-      if (state.gold < 150) return setSpeech("Você precisa de 150 Gold para abrir o Baú Misterioso!");
+      if (state.gold < 150) return setSpeech("Você precisa de 150 moedas para abrir o Cofre do Viajante!");
       state.gold -= 150;
 
-      const prizes = [
-        { title: "Caçador de Juros [Raro]", aura: "#209cee" },
-        { title: "Lorde do Cashback [Épico]", aura: "#b86bff" },
-        { title: "Oráculo do PIX [Lendário]", aura: "#ffd700" },
-        { title: "Paladino do Serasa Score 1000 [Mítico]", aura: "#23d160" }
+      const rewards = [
+        { title: "Barão de Rynoka [Raro]", aura: "rgba(60, 214, 181, 0.35)" },
+        { title: "Mestre Alquimista [Épico]", aura: "rgba(184, 107, 255, 0.38)" },
+        { title: "Guardião do Luar [Lendário]", aura: "rgba(255, 207, 92, 0.45)" }
       ];
-
-      const won = prizes[Math.floor(Math.random() * prizes.length)];
+      const won = rewards[Math.floor(Math.random() * rewards.length)];
       state.nobleTitle = won.title;
       state.auraColor = won.aura;
       playSound("levelup");
-      setSpeech(`🎁 GACHA! Você desbloqueou o título "${won.title}" e uma nova Aura!`);
+      setSpeech(`✨ Relíquia encontrada! Novo título: "${won.title}"!`);
       saveState();
     }
 
-    // Mercador Semanal baseado na semana do ano
-    function renderMerchant() {
-      const now = new Date();
-      const weekSeed = Math.floor(now.getDate() / 7) + now.getMonth() * 4;
-      document.getElementById("merchant-timer").innerText = `Estoque Raro da Semana #${weekSeed + 1} (Muda automaticamente toda semana)`;
-
-      const weeklyCatalog = [
-        { name: "Pergaminho do Investidor", desc: "+150 XP Imediato", cost: 110, xp: 150 },
-        { name: "Relíquia do Dragão Dourado", desc: "Título Exclusivo da Semana + Aura Carmesim", cost: 220, title: "Domador de Dragões [Semanal]", aura: "#ff3860" },
-        { name: "Tomo da Prosperidade", desc: "+300 XP Imediato", cost: 200, xp: 300 }
-      ];
-
-      const container = document.getElementById("merchant-list");
-      container.innerHTML = weeklyCatalog.map((item, idx) => `
-        <div class="shop-item">
-          <div>
-            <strong class="pixel-font" style="font-size: 10px; color: var(--gold);">${item.name}</strong>
-            <p style="margin-top: 6px;">${item.desc}</p>
-          </div>
-          <button class="btn-rpg btn-gold" onclick="buyMerchantItem(${idx})">COMPRAR (${item.cost} GOLD)</button>
-        </div>
-      `).join("");
-    }
-
-    function buyMerchantItem(idx) {
-      const weeklyCatalog = [
-        { name: "Pergaminho do Investidor", cost: 110, xp: 150 },
-        { name: "Relíquia do Dragão Dourado", cost: 220, title: "Domador de Dragões [Semanal]", aura: "#ff3860" },
-        { name: "Tomo da Prosperidade", cost: 200, xp: 300 }
-      ];
-      const item = weeklyCatalog[idx];
-      if (state.gold < item.cost) return setSpeech("Ouro insuficiente para comprar do Mercador Viajante!");
-
-      state.gold -= item.cost;
-      if (item.xp) gainXPAndGold(item.xp, 0, null);
-      if (item.title) {
-        state.nobleTitle = item.title;
-        state.auraColor = item.aura;
-        playSound("levelup");
-      }
-      setSpeech(`⛺ Você comprou "${item.name}" do Mercador Viajante!`);
-      saveState();
-    }
-
-    // ================= FINANÇAS E MANA =================
     function updateFinanceConfig() {
       const val = parseFloat(document.getElementById("input-budget").value);
       if (val > 0) {
@@ -929,97 +894,83 @@
       if (isNaN(val) || val <= 0) return;
       state.manaSaved += val;
       document.getElementById("input-mana-add").value = "";
-      setSpeech(`💙 Você guardou R$ ${val} na reserva! Sua barra de MANA subiu!`);
+      setSpeech(`💧 R$ ${val} guardados na Reserva de Éter!`);
       gainXPAndGold(60, 25, null);
     }
 
-    // ================= RENDERIZAÇÃO GERAL =================
     function renderAll() {
-      // HUD XP, Nível e Gold
       const xpNeeded = state.level * 100;
-      const xpPercent = Math.min(100, (state.xp / xpNeeded) * 100);
-      document.getElementById("lvl-text").innerText = `LVL ${state.level}`;
+      document.getElementById("lvl-text").innerText = `NÍVEL ${state.level}`;
       document.getElementById("xp-text").innerText = `${state.xp}/${xpNeeded} XP`;
-      document.getElementById("xp-bar").style.width = `${xpPercent}%`;
+      document.getElementById("xp-bar").style.width = `${Math.min(100, (state.xp / xpNeeded) * 100)}%`;
       document.getElementById("gold-text").innerText = state.gold;
-      document.getElementById("elixir-indicator").innerText = state.elixirCharges > 0 ? `⚡2x XP (${state.elixirCharges}x)` : "";
+      document.getElementById("elixir-badge").innerText = state.elixirCharges > 0 ? `🧪 2x XP (${state.elixirCharges}x)` : "";
 
-      // Cálculo de HP (Orçamento Livre)
       const totalBills = state.bills.reduce((acc, b) => acc + b.amount, 0);
       const rawHp = Math.max(0, Math.round(((state.budget - totalBills) / state.budget) * 100));
       const finalHp = Math.min(100, rawHp + (state.hpBonus || 0));
       document.getElementById("hp-text").innerText = `${finalHp}%`;
       document.getElementById("hp-bar").style.width = `${finalHp}%`;
 
-      // Cálculo de Mana (Reserva)
-      const manaPercent = Math.min(100, (state.manaSaved / 2000) * 100);
       document.getElementById("mp-text").innerText = `R$ ${state.manaSaved}`;
-      document.getElementById("mp-bar").style.width = `${manaPercent}%`;
+      document.getElementById("mp-bar").style.width = `${Math.min(100, (state.manaSaved / 2000) * 100)}%`;
 
-      // Evolução de Classe do Guardião
-      let className = "CLASSE: APRENDIZ DE BOLETOS";
-      if (state.level >= 3 && state.level < 6) className = "CLASSE: GUERREIRO DOS BOLETOS ⚔️";
-      if (state.level >= 6) className = "CLASSE: MAGO SUPREMO DA RIQUEZA 👑";
-      document.getElementById("class-title").innerText = className;
-      document.getElementById("noble-title").innerText = `Título: ${state.nobleTitle}`;
+      let rankName = "Mercador Aprendiz de Rynoka";
+      if (state.level >= 3 && state.level < 6) rankName = "Aventureiro das Relíquias 🗡️";
+      if (state.level >= 6) rankName = "Mestre Supremo do Luar 👑";
+      document.getElementById("class-title").innerText = rankName;
+      document.getElementById("noble-title").innerText = state.nobleTitle;
 
-      // Aura e Sprite do Gato
-      const auraEl = document.getElementById("guardian-aura");
-      auraEl.style.background = state.auraColor;
-      auraEl.style.opacity = state.auraColor !== "transparent" ? "0.45" : "0";
-      document.getElementById("guardian-svg-container").innerHTML = getGuardianSVG(state.level);
+      document.getElementById("lantern-aura").style.background = `radial-gradient(circle, ${state.auraColor} 0%, transparent 72%)`;
+      document.getElementById("guardian-art").innerHTML = getGuardianIllustration(state.level);
 
-      // Decorações Equipadas no Acampamento
-      document.getElementById("slot-campfire").innerHTML = getDecorSVG("campfire", state.forge.campfire.level);
-      document.getElementById("slot-chest").innerHTML = getDecorSVG("chest", state.forge.chest.level);
+      document.getElementById("slot-lantern").innerHTML = getDecorIllustration("lantern", state.forge.lantern.level);
+      document.getElementById("slot-chest").innerHTML = getDecorIllustration("chest", state.forge.chest.level);
 
-      // Lista de Monstros (Boletos Pendentes)
-      const pendingBills = state.bills.filter(b => !b.paid);
-      const maxAmount = pendingBills.length ? Math.max(...pendingBills.map(b => b.amount)) : 0;
+      const pending = state.bills.filter(b => !b.paid);
+      const maxVal = pending.length ? Math.max(...pending.map(b => b.amount)) : 0;
+      const listEl = document.getElementById("monsters-list");
 
-      const monstersContainer = document.getElementById("monsters-list");
-      if (pendingBills.length === 0) {
-        monstersContainer.innerHTML = `<p style="color: var(--xp-green); text-align: center; padding: 16px;">🎉 MASMORRA LIMPA! Todos os boletos foram derrotados!</p>`;
+      if (pending.length === 0) {
+        listEl.innerHTML = `<p style="text-align: center; color: var(--teal-magic); font-weight: 700; padding: 18px;">✨ Masmorra purificada! Todas as contas do mês estão pagas!</p>`;
       } else {
-        monstersContainer.innerHTML = pendingBills.map(bill => {
-          const isBoss = bill.amount === maxAmount && pendingBills.length > 1;
+        listEl.innerHTML = pending.map(bill => {
+          const isBoss = bill.amount === maxVal && pending.length > 1;
           return `
-            <div class="monster-card ${isBoss ? 'boss' : ''}" id="bill-card-${bill.id}">
-              <div class="monster-info">
-                <div class="monster-icon">${getMonsterSVG(isBoss)}</div>
+            <div class="monster-row ${isBoss ? 'boss' : ''}" id="bill-card-${bill.id}">
+              <div style="display: flex; align-items: center; gap: 14px; flex: 1;">
+                <div class="monster-avatar">${getMonsterIllustration(isBoss)}</div>
                 <div style="flex: 1;">
-                  ${isBoss ? '<span class="boss-tag">🔥 BOSS DO MÊS</span><br>' : ''}
-                  <strong style="font-size: 22px;">${bill.name}</strong>
-                  <div style="color: #aaa; font-size: 16px;">Vencimento: ${bill.due} | HP do Monstro: <strong style="color: var(--gold);">R$ ${bill.amount.toFixed(2)}</strong></div>
-                  ${isBoss ? `<div class="bar-bg" style="height: 8px; margin-top: 4px;"><div class="bar-fill hp-fill" style="width: 100%;"></div></div>` : ''}
+                  ${isBoss ? '<span class="boss-pill">🔥 Guardião da Masmorra (Maior Conta)</span><br>' : ''}
+                  <strong class="title-font" style="font-size: 18px;">${bill.name}</strong>
+                  <div style="color: var(--text-muted); font-size: 14px; margin-top: 2px;">
+                    Vencimento: ${bill.due} • Valor: <strong style="color: var(--gold-warm);">R$ ${bill.amount.toFixed(2)}</strong>
+                  </div>
                 </div>
               </div>
-              <button class="btn-rpg btn-pay" onclick="payBill(${bill.id}, this)">⚔️ ATACAR (PAGAR)</button>
+              <button class="btn-cozy btn-strike" onclick="payBill(${bill.id}, this)">🗡️ Derrotar</button>
             </div>
           `;
         }).join("");
       }
 
-      // Renderizar Forja na Taverna
-      const forgeContainer = document.getElementById("forge-list");
-      forgeContainer.innerHTML = Object.keys(state.forge).map(key => {
+      document.getElementById("forge-list").innerHTML = Object.keys(state.forge).map(key => {
         const item = state.forge[key];
-        const nextCost = item.baseCost * (item.level + 1);
+        const cost = item.baseCost * (item.level + 1);
         return `
-          <div class="shop-item">
+          <div class="shop-card">
             <div>
-              <strong class="pixel-font" style="font-size: 10px; color: var(--gold);">${item.name} (LVL ${item.level})</strong>
-              <p style="margin-top: 6px;">Melhora o visual no seu acampamento a cada nível forjado.</p>
+              <strong class="title-font" style="color: var(--gold-warm);">${item.name} (Nv. ${item.level})</strong>
+              <p style="color: var(--text-muted); font-size: 14px; margin-top: 6px;">Ilumina o seu Empório com novas cores de éter a cada nível.</p>
             </div>
-            <button class="btn-rpg btn-gold" onclick="upgradeForge('${key}')">
-              ${item.level === 0 ? 'COMPRAR' : 'FORJAR LVL ' + (item.level + 1)} (${nextCost} GOLD)
+            <button class="btn-cozy btn-gold" onclick="upgradeForge('${key}')">
+              ${item.level === 0 ? 'Construir' : 'Aprimorar Nv. ' + (item.level + 1)} (${cost} 🪙)
             </button>
           </div>
         `;
       }).join("");
 
       document.getElementById("input-budget").value = state.budget;
-      renderMerchant();
     }
 
     function switchTab(tab) {
@@ -1029,19 +980,16 @@
       });
     }
 
-    // ================= FUNÇÕES DO MODO TESTE (RODAPÉ) =================
     function devBoost() {
-      gainXPAndGold(120, 250, document.querySelector(".dev-bar"), true);
+      gainXPAndGold(120, 250, document.querySelector(".dev-footer"), true);
     }
 
     function resetGame() {
-      localStorage.removeItem("rpg_finance_state");
+      localStorage.removeItem("moonlight_finance_state");
       state = JSON.parse(JSON.stringify(defaultState));
       renderAll();
-      setSpeech("Progresso resetado! Pronto para uma nova jornada financeira!");
     }
 
-    // Inicializar
     renderAll();
   </script>
 </body>
