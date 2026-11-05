@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quest Financeira - RPG de Boletos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #12131f;
+      --bg-panel: #1e2036;
+      --border-light: #f4f4f4;
+      --gold: #ffd700;
+      --hp-red: #ff3860;
+      --mp-blue: #209cee;
+      --xp-green: #23d160;
+      --purple-epic: #b86bff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: #fff;
+      font-family: 'VT323', monospace;
+      font-size: 20px;
+      padding-bottom: 80px;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, .pixel-font {
+      font-family: 'Press Start 2P', cursive;
+      text-transform: uppercase;
+    }
+
+    /* Moldura estilo RPG Clássico */
+    .rpg-box {
+      background: var(--bg-panel);
+      border: 4px solid var(--border-light);
+      box-shadow: 
+        inset -4px -4px 0px 0px #0d0e1a,
+        inset 4px 4px 0px 0px #3a3f66,
+        0 6px 0 #000;
+      padding: 16px;
+      margin-bottom: 18px;
+      position: relative;
+    }
+
+    .container {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 12px;
+    }
+
+    /* HUD Fixo no Topo */
+    .hud-top {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: #0d0e1a;
+      border-bottom: 4px solid var(--gold);
+      padding: 10px 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.7);
+    }
+
+    .hud-grid {
+      max-width: 780px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      align-items: center;
+    }
+
+    .stat-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-label {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .bar-bg {
+      width: 100%;
+      height: 14px;
+      background: #000;
+      border: 2px solid #fff;
+      position: relative;
+    }
+
+    .bar-fill {
+      height: 100%;
+      transition: width 0.3s ease;
+    }
+
+    .hp-fill { background: var(--hp-red); }
+    .mp-fill { background: var(--mp-blue); }
+    .xp-fill { background: var(--gold); }
+
+    .gold-badge {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 12px;
+      color: var(--gold);
+      text-align: right;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    /* Acampamento do Guardião */
+    .sanctuary {
+      background: linear-gradient(180deg, #161936 0%, #242b4d 75%, #1d3a2a 75%, #14261c 100%);
+      min-height: 230px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .aura-effect {
+      position: absolute;
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      top: 45px;
+      filter: blur(18px);
+      opacity: 0;
+      transition: all 0.5s ease;
+      pointer-events: none;
+    }
+
+    .dialog-bubble {
+      background: #fff;
+      color: #000;
+      border: 3px solid #000;
+      padding: 8px 12px;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 10px;
+      line-height: 1.5;
+      max-width: 90%;
+      text-align: center;
+      z-index: 5;
+      box-shadow: 4px 4px 0 rgba(0,0,0,0.5);
+    }
+
+    .stage-floor {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 24px;
+      width: 100%;
+      padding: 10px 0;
+      z-index: 5;
+    }
+
+    .guardian-sprite {
+      width: 110px;
+      height: 110px;
+      animation: floatIdle 1.6s infinite ease-in-out;
+    }
+
+    .decor-slot {
+      width: 64px;
+      height: 64px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      position: relative;
+    }
+
+    .forge-badge {
+      position: absolute;
+      bottom: -8px;
+      background: #000;
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      font-family: 'Press Start 2P', cursive;
+      font-size: 8px;
+      padding: 2px 4px;
+    }
+
+    @keyframes floatIdle {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+    }
+
+    /* Abas de Navegação */
+    .nav-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .btn-rpg {
+      background: #2e325c;
+      color: #fff;
+      border: 3px solid #fff;
+      padding: 10px 8px;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 0 #000;
+      transition: transform 0.1s;
+    }
+
+    .btn-rpg:active {
+      transform: translateY(4px);
+      box-shadow: 0 0 0 #000;
+    }
+
+    .btn-rpg.active {
+      background: var(--gold);
+      color: #000;
+      border-color: #fff;
+    }
+
+    .btn-pay {
+      background: var(--xp-green);
+      color: #000;
+    }
+
+    .btn-gold {
+      background: var(--gold);
+      color: #000;
+    }
+
+    /* Inputs e Formulário */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr auto;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    @media (max-width: 600px) {
+      .form-grid { grid-template-columns: 1fr; }
+    }
+
+    input, select {
+      background: #0d0e1a;
+      border: 2px solid #fff;
+      color: #fff;
+      padding: 8px;
+      font-family: 'VT323', monospace;
+      font-size: 20px;
+    }
+
+    /* Cards de Boletos / Monstros */
+    .monster-card {
+      background: #15172b;
+      border: 3px solid #4a5080;
+      padding: 12px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      transition: all 0.2s;
+    }
+
+    .monster-card.boss {
+      border-color: var(--hp-red);
+      background: linear-gradient(90deg, #2b111c 0%, #15172b 100%);
+    }
+
+    .monster-info {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex: 1;
+    }
+
+    .monster-icon {
+      width: 52px;
+      height: 52px;
+      flex-shrink: 0;
+    }
+
+    .boss-tag {
+      background: var(--hp-red);
+      color: #fff;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 8px;
+      padding: 3px 6px;
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+
+    /* Animação de Dano quando paga boleto */
+    .hit-anim {
+      animation: monsterHit 0.45s ease forwards;
+    }
+
+    @keyframes monsterHit {
+      0% { transform: translateX(0); filter: brightness(1); }
+      20% { transform: translateX(-10px) scale(1.05); filter: brightness(5) invert(1); }
+      40% { transform: translateX(10px); }
+      60% { transform: translateX(-6px); opacity: 0.5; }
+      100% { transform: scale(0); opacity: 0; }
+    }
+
+    /* Texto Flutuante de XP e Crítico */
+    .floating-xp {
+      position: fixed;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 13px;
+      color: var(--gold);
+      text-shadow: 2px 2px 0 #000;
+      pointer-events: none;
+      z-index: 9999;
+      animation: floatUp 1.2s ease-out forwards;
+    }
+
+    @keyframes floatUp {
+      0% { opacity: 1; transform: translateY(0) scale(0.9); }
+      50% { transform: translateY(-35px) scale(1.1); }
+      100% { opacity: 0; transform: translateY(-70px) scale(1); }
+    }
+
+    /* Grid da Taverna */
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .shop-item {
+      background: #141629;
+      border: 2px solid #596096;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    /* Rodapé Modo Dev */
+    .dev-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #090a12;
+      border-top: 2px dashed #555;
+      padding: 8px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 200;
+      font-size: 16px;
+    }
+
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+
+  <!-- HUD FIXO -->
+  <header class="hud-top">
+    <div class="hud-grid">
+      <div class="stat-row">
+        <div class="stat-label">
+          <span>HP (ORÇAMENTO)</span>
+          <span id="hp-text">100%</span>
+        </div>
+        <div class="bar-bg"><div id="hp-bar" class="bar-fill hp-fill" style="width: 100%;"></div></div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-label">
+          <span>MANA (RESERVA)</span>
+          <span id="mp-text">R$ 0</span>
+        </div>
+        <div class="bar-bg"><div id="mp-bar" class="bar-fill mp-fill" style="width: 25%;"></div></div>
+      </div>
+
+      <div class="stat-row">
+        <div class="stat-label">
+          <span id="lvl-text">LVL 1</span>
+          <span id="xp-text">0/100 XP</span>
+        </div>
+        <div class="bar-bg"><div id="xp-bar" class="bar-fill xp-fill" style="width: 0%;"></div></div>
+      </div>
+
+      <div class="gold-badge">
+        <span id="elixir-indicator" style="color: var(--purple-epic); font-size: 9px;"></span>
+        <span>🪙 <span id="gold-text">50</span> GOLD</span>
+        <button id="mute-btn" class="btn-rpg" style="padding: 4px 6px;" onclick="toggleMute()">🔊</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- ACAMPAMENTO DO GUARDIÃO -->
+    <section class="rpg-box sanctuary">
+      <div id="guardian-aura" class="aura-effect"></div>
+
+      <div style="width: 100%; display: flex; justify-content: space-between; font-size: 16px; z-index: 5;">
+        <span id="class-title" class="pixel-font" style="font-size: 10px; color: var(--gold);">CLASSE: APRENDIZ DE BOLETOS</span>
+        <span id="noble-title" style="color: #b86bff;">Título: Aldeão Sem Trocado</span>
+      </div>
+
+      <div id="guardian-speech" class="dialog-bubble">
+        "Pague uma conta antes do vencimento para dar DANO CRÍTICO (2x XP)!"
+      </div>
+
+      <div class="stage-floor">
+        <!-- Slot Esquerdo (Fogueira) -->
+        <div class="decor-slot" id="slot-campfire"></div>
+
+        <!-- O Gato Guardião Evolutivo -->
+        <div class="guardian-sprite" id="guardian-svg-container"></div>
+
+        <!-- Slot Direito (Baú) -->
+        <div class="decor-slot" id="slot-chest"></div>
+      </div>
+    </section>
+
+    <!-- NAVEGAÇÃO -->
+    <nav class="nav-tabs">
+      <button class="btn-rpg active" id="tab-btn-dungeon" onclick="switchTab('dungeon')">⚔️ MASMORRA (CONTAS)</button>
+      <button class="btn-rpg" id="tab-btn-tavern" onclick="switchTab('tavern')">🍺 TAVERNA & FORJA</button>
+      <button class="btn-rpg" id="tab-btn-stats" onclick="switchTab('stats')">📜 ORÇAMENTO & MANA</button>
+    </nav>
+
+    <!-- ABA 1: MASMORRA DE BOLETOS -->
+    <main id="tab-dungeon">
+      <div class="rpg-box">
+        <h3 style="font-size: 12px; margin-bottom: 12px; color: var(--gold);">INVOCAR NOVO BOLETO (CONTA)</h3>
+        <div class="form-grid">
+          <input type="text" id="bill-name" placeholder="Ex: Fatura Cartão, Internet...">
+          <input type="number" id="bill-amount" placeholder="Valor (R$)">
+          <input type="date" id="bill-due">
+          <button class="btn-rpg btn-gold" onclick="addBill()">+ INVOCAR</button>
+        </div>
+      </div>
+
+      <div class="rpg-box">
+        <h3 style="font-size: 12px; margin-bottom: 12px;">MONSTROS DO MÊS ATUAL</h3>
+        <div id="monsters-list"></div>
+      </div>
+    </main>
+
+    <!-- ABA 2: TAVERNA DE LOOT INFINITA -->
+    <section id="tab-tavern" class="hidden">
+      <!-- Forja e Decoração -->
+      <div class="rpg-box">
+        <h3 style="font-size: 12px; color: var(--gold);">⚒️ FORJA & ACAMPAMENTO (UPGRADE INFINITO)</h3>
+        <p style="color: #ccc; margin-top: 4px;">Suba o nível dos itens para mudar o brilho e a cor deles no seu cenário!</p>
+        <div class="shop-grid" id="forge-list"></div>
+      </div>
+
+      <!-- Consumíveis e Gacha -->
+      <div class="rpg-box">
+        <h3 style="font-size: 12px; color: var(--purple-epic);">🧪 ALQUIMIA & BAÚ GACHA</h3>
+        <div class="shop-grid">
+          <div class="shop-item">
+            <div>
+              <strong class="pixel-font" style="font-size: 10px; color: #23d160;">ELIXIR DE SABEDORIA</strong>
+              <p style="margin-top: 6px;">Dobra o XP (2x) dos próximos 3 boletos derrotados!</p>
+            </div>
+            <button class="btn-rpg btn-gold" onclick="buyElixir()">COMPRAR (80 GOLD)</button>
+          </div>
+
+          <div class="shop-item">
+            <div>
+              <strong class="pixel-font" style="font-size: 10px; color: var(--mp-blue);">POÇÃO DE ESCUDO</strong>
+              <p style="margin-top: 6px;">Restaura +25% do seu HP financeiro na hora.</p>
+            </div>
+            <button class="btn-rpg btn-gold" onclick="buyHeal()">COMPRAR (60 GOLD)</button>
+          </div>
+
+          <div class="shop-item" style="border-color: var(--purple-epic);">
+            <div>
+              <strong class="pixel-font" style="font-size: 10px; color: var(--purple-epic);">🎁 BAÚ MISTERIOSO (GACHA)</strong>
+              <p style="margin-top: 6px;">Sorteia Auras Místicas e Títulos Raros ou Lendários!</p>
+            </div>
+            <button class="btn-rpg" style="background: var(--purple-epic); color: #000;" onclick="rollGacha()">ABRIR (150 GOLD)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mercador Viajante Semanal -->
+      <div class="rpg-box" style="border-color: var(--gold);">
+        <h3 style="font-size: 12px; color: var(--gold);">⛺ MERCADOR VIAJANTE (ROTAÇÃO DA SEMANA)</h3>
+        <p style="color: #aaa; margin-top: 4px;" id="merchant-timer"></p>
+        <div class="shop-grid" id="merchant-list"></div>
+      </div>
+    </section>
+
+    <!-- ABA 3: ORÇAMENTO & RESERVA (MANA) -->
+    <section id="tab-stats" class="hidden">
+      <div class="rpg-box">
+        <h3 style="font-size: 12px; color: var(--gold); margin-bottom: 12px;">CONFIGURAR RENDA E RESERVA DE MANA</h3>
+        <div style="display: grid; gap: 12px;">
+          <div>
+            <label>Orçamento Mensal Total (R$):</label><br>
+            <input type="number" id="input-budget" style="width: 100%; margin-top: 4px;" onchange="updateFinanceConfig()">
+          </div>
+          <div>
+            <label>Guardar na Reserva / Poupança (Aumenta MANA e dá XP):</label>
+            <div style="display: flex; gap: 8px; margin-top: 4px;">
+              <input type="number" id="input-mana-add" placeholder="Valor guardado (R$)" style="flex: 1;">
+              <button class="btn-rpg" style="background: var(--mp-blue);" onclick="addManaSavings()">+ CANALIZAR MANA</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- RODAPÉ MODO DEV PARA TESTE IMEDIATO -->
+  <footer class="dev-bar">
+    <span>🛠️ <strong>MODO TESTE:</strong> Clique ao lado para testar todas as evoluções agora!</span>
+    <div style="display: flex; gap: 8px;">
+      <button class="btn-rpg btn-gold" onclick="devBoost()">⚡ +120 XP / +250 GOLD</button>
+      <button class="btn-rpg" style="background: #ff3860;" onclick="resetGame()">RESET</button>
+    </div>
+  </footer>
+
+  <script>
+    // ================= ESTADO DO JOGO (SALVO NO LOCALSTORAGE) =================
+    const defaultState = {
+      xp: 0,
+      level: 1,
+      gold: 100,
+      budget: 3500,
+      manaSaved: 300,
+      hpBonus: 0,
+      elixirCharges: 0,
+      nobleTitle: "Aldeão Sem Trocado",
+      auraColor: "transparent",
+      muted: false,
+      forge: {
+        campfire: { level: 0, name: "Fogueira Mística", baseCost: 50 },
+        chest: { level: 0, name: "Baú do Tesouro", baseCost: 80 }
+      },
+      bills: [
+        { id: 1, name: "Fatura do Cartão", amount: 1250, due: "2026-11-20", paid: false },
+        { id: 2, name: "Internet Fibra", amount: 120, due: "2026-11-15", paid: false },
+        { id: 3, name: "Conta de Luz", amount: 185, due: "2026-11-10", paid: false }
+      ]
+    };
+
+    let state = JSON.parse(localStorage.getItem("rpg_finance_state")) || defaultState;
+
+    function saveState() {
+      localStorage.setItem("rpg_finance_state", JSON.stringify(state));
+      renderAll();
+    }
+
+    // ================= WEB AUDIO API (SONS 8-BIT PUROS) =================
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx;
+
+    function playSound(type) {
+      if (state.muted) return;
+      if (!audioCtx) audioCtx = new AudioCtx();
+      const now = audioCtx.currentTime;
+
+      if (type === "attack") {
+        // Som de golpe + moeda
+        [260, 520, 780].forEach((freq, idx) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = "square";
+          osc.frequency.setValueAtTime(freq, now + idx * 0.06);
+          gain.gain.setValueAtTime(0.12, now + idx * 0.06);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + (idx + 1) * 0.08);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now + idx * 0.06);
+          osc.stop(now + (idx + 1) * 0.08);
+        });
+      } else if (type === "levelup") {
+        // Fanfarra clássica de RPG
+        const notes = [330, 392, 659, 523, 587, 784];
+        notes.forEach((freq, idx) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = "triangle";
+          osc.frequency.setValueAtTime(freq, now + idx * 0.09);
+          gain.gain.setValueAtTime(0.2, now + idx * 0.09);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + (idx + 1) * 0.12);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now + idx * 0.09);
+          osc.stop(now + (idx + 1) * 0.12);
+        });
+      } else if (type === "buy") {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(587, now);
+        osc.frequency.setValueAtTime(880, now + 0.07);
+        gain.gain.setValueAtTime(0.15, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.2);
+      }
+    }
+
+    function toggleMute() {
+      state.muted = !state.muted;
+      document.getElementById("mute-btn").innerText = state.muted ? "🔇" : "🔊";
+      saveState();
+    }
+
+    // ================= ARTES EM PIXEL ART (SVG) =================
+    function getGuardianSVG(level) {
+      const hasSword = level >= 3;
+      const isMage = level >= 6;
+
+      return `
+      <svg viewBox="0 0 16 16" width="100%" height="100%" shape-rendering="crispEdges">
+        <!-- Espada nas costas (Nível 3+) -->
+        ${hasSword ? `
+          <rect x="2" y="2" width="2" height="2" fill="#ffd700"/>
+          <rect x="3" y="4" width="2" height="7" fill="#d0d0e0"/>
+        ` : ''}
+
+        <!-- Capa Mística (Nível 6+) -->
+        ${isMage ? `
+          <rect x="3" y="8" width="10" height="6" fill="#7928ca"/>
+        ` : ''}
+
+        <!-- Orelhas e Cabeça do Gato -->
+        <rect x="4" y="3" width="2" height="2" fill="#262b44"/>
+        <rect x="10" y="3" width="2" height="2" fill="#262b44"/>
+        <rect x="4" y="5" width="8" height="6" fill="#262b44"/>
+
+        <!-- Bandana Vermelha de Aprendiz -->
+        <rect x="4" y="5" width="8" height="1" fill="#ff3860"/>
+        <rect x="12" y="6" width="2" height="1" fill="#ff3860"/>
+
+        <!-- Chapéu / Coroa de Mago Supremo (Nível 6+) -->
+        ${isMage ? `
+          <rect x="3" y="3" width="10" height="1" fill="#ffd700"/>
+          <rect x="5" y="1" width="6" height="2" fill="#9b4dff"/>
+          <rect x="7" y="0" width="2" height="1" fill="#ffd700"/>
+        ` : ''}
+
+        <!-- Olhos Brilhantes -->
+        <rect x="5" y="7" width="2" height="2" fill="#ffd700"/>
+        <rect x="9" y="7" width="2" height="2" fill="#ffd700"/>
+        <!-- Focinho -->
+        <rect x="7" y="9" width="2" height="1" fill="#ff99aa"/>
+
+        <!-- Corpo e Patas -->
+        <rect x="5" y="11" width="6" height="4" fill="#262b44"/>
+        <rect x="5" y="14" width="2" height="1" fill="#fff"/>
+        <rect x="9" y="14" width="2" height="1" fill="#fff"/>
+
+        <!-- Escudo Reluzente (Nível 3+) -->
+        ${hasSword ? `
+          <rect x="10" y="10" width="4" height="4" fill="#209cee"/>
+          <rect x="11" y="11" width="2" height="2" fill="#ffd700"/>
+        ` : ''}
+      </svg>`;
+    }
+
+    function getMonsterSVG(isBoss) {
+      if (isBoss) {
+        // Boss Dragão Vermelho
+        return `
+        <svg viewBox="0 0 16 16" width="100%" height="100%" shape-rendering="crispEdges">
+          <rect x="2" y="2" width="3" height="2" fill="#ffd700"/>
+          <rect x="11" y="2" width="3" height="2" fill="#ffd700"/>
+          <rect x="3" y="4" width="10" height="9" fill="#ff3860"/>
+          <rect x="1" y="6" width="2" height="5" fill="#990022"/>
+          <rect x="13" y="6" width="2" height="5" fill="#990022"/>
+          <rect x="5" y="6" width="2" height="2" fill="#ffdd00"/>
+          <rect x="9" y="6" width="2" height="2" fill="#ffdd00"/>
+          <rect x="5" y="11" width="6" height="1" fill="#fff"/>
+        </svg>`;
+      }
+      // Slime Verde Comum
+      return `
+      <svg viewBox="0 0 16 16" width="100%" height="100%" shape-rendering="crispEdges">
+        <rect x="6" y="4" width="4" height="2" fill="#23d160"/>
+        <rect x="4" y="6" width="8" height="3" fill="#23d160"/>
+        <rect x="2" y="9" width="12" height="5" fill="#23d160"/>
+        <rect x="5" y="9" width="2" height="2" fill="#000"/>
+        <rect x="9" y="9" width="2" height="2" fill="#000"/>
+      </svg>`;
+    }
+
+    function getDecorSVG(type, level) {
+      if (level <= 0) return "";
+      // Muda a cor da chama/baú conforme o nível na Forja!
+      const flameColors = ["#ff6600", "#209cee", "#b86bff", "#ffd700"];
+      const color = flameColors[(level - 1) % flameColors.length];
+
+      if (type === "campfire") {
+        return `
+        <svg viewBox="0 0 16 16" width="48" height="48" shape-rendering="crispEdges">
+          <rect x="6" y="4" width="4" height="6" fill="${color}"/>
+          <rect x="7" y="2" width="2" height="3" fill="#fff"/>
+          <rect x="3" y="11" width="10" height="3" fill="#8b5a2b"/>
+        </svg>
+        <span class="forge-badge">LVL ${level}</span>`;
+      }
+      if (type === "chest") {
+        return `
+        <svg viewBox="0 0 16 16" width="48" height="48" shape-rendering="crispEdges">
+          <rect x="2" y="5" width="12" height="9" fill="#8b5a2b"/>
+          <rect x="2" y="8" width="12" height="2" fill="${color}"/>
+          <rect x="7" y="7" width="2" height="4" fill="#ffd700"/>
+        </svg>
+        <span class="forge-badge">LVL ${level}</span>`;
+      }
+    }
+
+    // ================= LÓGICA DE COMBATE E XP =================
+    function gainXPAndGold(xpAmount, goldAmount, eventElement, isCrit = false) {
+      if (state.elixirCharges > 0) {
+        xpAmount *= 2;
+        state.elixirCharges--;
+      }
+
+      state.xp += xpAmount;
+      state.gold += goldAmount;
+
+      // Texto flutuante na tela
+      if (eventElement) {
+        const rect = eventElement.getBoundingClientRect();
+        const floatEl = document.createElement("div");
+        floatEl.className = "floating-xp";
+        floatEl.style.left = `${rect.left + 20}px`;
+        floatEl.style.top = `${rect.top}px`;
+        floatEl.innerHTML = `${isCrit ? '⚡ CRÍTICO! ' : ''}+${xpAmount} XP | +${goldAmount} 🪙`;
+        document.body.appendChild(floatEl);
+        setTimeout(() => floatEl.remove(), 1200);
+      }
+
+      // Verifica Level Up
+      const xpNeeded = state.level * 100;
+      if (state.xp >= xpNeeded) {
+        state.xp -= xpNeeded;
+        state.level++;
+        playSound("levelup");
+        setSpeech(`🎉 LEVEL UP! Alcancei o Nível ${state.level}! Meus equipamentos evoluíram!`);
+      } else {
+        playSound("attack");
+      }
+
+      saveState();
+    }
+
+    function setSpeech(text) {
+      document.getElementById("guardian-speech").innerText = `"${text}"`;
+    }
+
+    function addBill() {
+      const name = document.getElementById("bill-name").value.trim();
+      const amount = parseFloat(document.getElementById("bill-amount").value);
+      const due = document.getElementById("bill-due").value;
+
+      if (!name || isNaN(amount) || amount <= 0) {
+        setSpeech("Preencha o nome e o valor do boleto para invocá-lo na masmorra!");
+        return;
+      }
+
+      state.bills.push({
+        id: Date.now(),
+        name,
+        amount,
+        due: due || new Date().toISOString().split("T")[0],
+        paid: false
+      });
+
+      document.getElementById("bill-name").value = "";
+      document.getElementById("bill-amount").value = "";
+      setSpeech(`Um novo monstro "${name}" apareceu na masmorra!`);
+      saveState();
+    }
+
+    function payBill(id, btnElement) {
+      const bill = state.bills.find(b => b.id === id);
+      if (!bill || bill.paid) return;
+
+      const card = document.getElementById(`bill-card-${id}`);
+      card.classList.add("hit-anim");
+
+      // Verifica se pagou adiantado ou em dia (Acerto Crítico!)
+      const today = new Date().toISOString().split("T")[0];
+      const isEarly = bill.due >= today;
+
+      const baseXP = isEarly ? 80 : 40;
+      const baseGold = isEarly ? 35 : 15;
+
+      setTimeout(() => {
+        bill.paid = true;
+        setSpeech(isEarly
+          ? `⚔️ ACERTO CRÍTICO em "${bill.name}"! Pagou em dia e ganhou XP em dobro!`
+          : `Boleto "${bill.name}" derrotado!`);
+        gainXPAndGold(baseXP, baseGold, btnElement, isEarly);
+      }, 380);
+    }
+
+    // ================= TAVERNA, FORJA, GACHA E MERCADOR =================
+    function upgradeForge(key) {
+      const item = state.forge[key];
+      const cost = item.baseCost * (item.level + 1);
+
+      if (state.gold < cost) {
+        setSpeech(`Faltam moedas! Você precisa de ${cost} Gold para forjar esse item.`);
+        return;
+      }
+
+      state.gold -= cost;
+      item.level++;
+      playSound("buy");
+      setSpeech(`⚒️ Forja concluída! "${item.name}" subiu para o Nível ${item.level}!`);
+      saveState();
+    }
+
+    function buyElixir() {
+      if (state.gold < 80) return setSpeech("Você precisa de 80 Gold para o Elixir!");
+      state.gold -= 80;
+      state.elixirCharges += 3;
+      playSound("buy");
+      setSpeech("🧪 Elixir ativado! Seus próximos 3 boletos darão o DOBRO de XP!");
+      saveState();
+    }
+
+    function buyHeal() {
+      if (state.gold < 60) return setSpeech("Você precisa de 60 Gold para a Poção!");
+      state.gold -= 60;
+      state.hpBonus = Math.min(100, (state.hpBonus || 0) + 25);
+      playSound("buy");
+      setSpeech("💙 Poção tomada! Seu HP mensal foi protegido!");
+      saveState();
+    }
+
+    function rollGacha() {
+      if (state.gold < 150) return setSpeech("Você precisa de 150 Gold para abrir o Baú Misterioso!");
+      state.gold -= 150;
+
+      const prizes = [
+        { title: "Caçador de Juros [Raro]", aura: "#209cee" },
+        { title: "Lorde do Cashback [Épico]", aura: "#b86bff" },
+        { title: "Oráculo do PIX [Lendário]", aura: "#ffd700" },
+        { title: "Paladino do Serasa Score 1000 [Mítico]", aura: "#23d160" }
+      ];
+
+      const won = prizes[Math.floor(Math.random() * prizes.length)];
+      state.nobleTitle = won.title;
+      state.auraColor = won.aura;
+      playSound("levelup");
+      setSpeech(`🎁 GACHA! Você desbloqueou o título "${won.title}" e uma nova Aura!`);
+      saveState();
+    }
+
+    // Mercador Semanal baseado na semana do ano
+    function renderMerchant() {
+      const now = new Date();
+      const weekSeed = Math.floor(now.getDate() / 7) + now.getMonth() * 4;
+      document.getElementById("merchant-timer").innerText = `Estoque Raro da Semana #${weekSeed + 1} (Muda automaticamente toda semana)`;
+
+      const weeklyCatalog = [
+        { name: "Pergaminho do Investidor", desc: "+150 XP Imediato", cost: 110, xp: 150 },
+        { name: "Relíquia do Dragão Dourado", desc: "Título Exclusivo da Semana + Aura Carmesim", cost: 220, title: "Domador de Dragões [Semanal]", aura: "#ff3860" },
+        { name: "Tomo da Prosperidade", desc: "+300 XP Imediato", cost: 200, xp: 300 }
+      ];
+
+      const container = document.getElementById("merchant-list");
+      container.innerHTML = weeklyCatalog.map((item, idx) => `
+        <div class="shop-item">
+          <div>
+            <strong class="pixel-font" style="font-size: 10px; color: var(--gold);">${item.name}</strong>
+            <p style="margin-top: 6px;">${item.desc}</p>
+          </div>
+          <button class="btn-rpg btn-gold" onclick="buyMerchantItem(${idx})">COMPRAR (${item.cost} GOLD)</button>
+        </div>
+      `).join("");
+    }
+
+    function buyMerchantItem(idx) {
+      const weeklyCatalog = [
+        { name: "Pergaminho do Investidor", cost: 110, xp: 150 },
+        { name: "Relíquia do Dragão Dourado", cost: 220, title: "Domador de Dragões [Semanal]", aura: "#ff3860" },
+        { name: "Tomo da Prosperidade", cost: 200, xp: 300 }
+      ];
+      const item = weeklyCatalog[idx];
+      if (state.gold < item.cost) return setSpeech("Ouro insuficiente para comprar do Mercador Viajante!");
+
+      state.gold -= item.cost;
+      if (item.xp) gainXPAndGold(item.xp, 0, null);
+      if (item.title) {
+        state.nobleTitle = item.title;
+        state.auraColor = item.aura;
+        playSound("levelup");
+      }
+      setSpeech(`⛺ Você comprou "${item.name}" do Mercador Viajante!`);
+      saveState();
+    }
+
+    // ================= FINANÇAS E MANA =================
+    function updateFinanceConfig() {
+      const val = parseFloat(document.getElementById("input-budget").value);
+      if (val > 0) {
+        state.budget = val;
+        saveState();
+      }
+    }
+
+    function addManaSavings() {
+      const val = parseFloat(document.getElementById("input-mana-add").value);
+      if (isNaN(val) || val <= 0) return;
+      state.manaSaved += val;
+      document.getElementById("input-mana-add").value = "";
+      setSpeech(`💙 Você guardou R$ ${val} na reserva! Sua barra de MANA subiu!`);
+      gainXPAndGold(60, 25, null);
+    }
+
+    // ================= RENDERIZAÇÃO GERAL =================
+    function renderAll() {
+      // HUD XP, Nível e Gold
+      const xpNeeded = state.level * 100;
+      const xpPercent = Math.min(100, (state.xp / xpNeeded) * 100);
+      document.getElementById("lvl-text").innerText = `LVL ${state.level}`;
+      document.getElementById("xp-text").innerText = `${state.xp}/${xpNeeded} XP`;
+      document.getElementById("xp-bar").style.width = `${xpPercent}%`;
+      document.getElementById("gold-text").innerText = state.gold;
+      document.getElementById("elixir-indicator").innerText = state.elixirCharges > 0 ? `⚡2x XP (${state.elixirCharges}x)` : "";
+
+      // Cálculo de HP (Orçamento Livre)
+      const totalBills = state.bills.reduce((acc, b) => acc + b.amount, 0);
+      const rawHp = Math.max(0, Math.round(((state.budget - totalBills) / state.budget) * 100));
+      const finalHp = Math.min(100, rawHp + (state.hpBonus || 0));
+      document.getElementById("hp-text").innerText = `${finalHp}%`;
+      document.getElementById("hp-bar").style.width = `${finalHp}%`;
+
+      // Cálculo de Mana (Reserva)
+      const manaPercent = Math.min(100, (state.manaSaved / 2000) * 100);
+      document.getElementById("mp-text").innerText = `R$ ${state.manaSaved}`;
+      document.getElementById("mp-bar").style.width = `${manaPercent}%`;
+
+      // Evolução de Classe do Guardião
+      let className = "CLASSE: APRENDIZ DE BOLETOS";
+      if (state.level >= 3 && state.level < 6) className = "CLASSE: GUERREIRO DOS BOLETOS ⚔️";
+      if (state.level >= 6) className = "CLASSE: MAGO SUPREMO DA RIQUEZA 👑";
+      document.getElementById("class-title").innerText = className;
+      document.getElementById("noble-title").innerText = `Título: ${state.nobleTitle}`;
+
+      // Aura e Sprite do Gato
+      const auraEl = document.getElementById("guardian-aura");
+      auraEl.style.background = state.auraColor;
+      auraEl.style.opacity = state.auraColor !== "transparent" ? "0.45" : "0";
+      document.getElementById("guardian-svg-container").innerHTML = getGuardianSVG(state.level);
+
+      // Decorações Equipadas no Acampamento
+      document.getElementById("slot-campfire").innerHTML = getDecorSVG("campfire", state.forge.campfire.level);
+      document.getElementById("slot-chest").innerHTML = getDecorSVG("chest", state.forge.chest.level);
+
+      // Lista de Monstros (Boletos Pendentes)
+      const pendingBills = state.bills.filter(b => !b.paid);
+      const maxAmount = pendingBills.length ? Math.max(...pendingBills.map(b => b.amount)) : 0;
+
+      const monstersContainer = document.getElementById("monsters-list");
+      if (pendingBills.length === 0) {
+        monstersContainer.innerHTML = `<p style="color: var(--xp-green); text-align: center; padding: 16px;">🎉 MASMORRA LIMPA! Todos os boletos foram derrotados!</p>`;
+      } else {
+        monstersContainer.innerHTML = pendingBills.map(bill => {
+          const isBoss = bill.amount === maxAmount && pendingBills.length > 1;
+          return `
+            <div class="monster-card ${isBoss ? 'boss' : ''}" id="bill-card-${bill.id}">
+              <div class="monster-info">
+                <div class="monster-icon">${getMonsterSVG(isBoss)}</div>
+                <div style="flex: 1;">
+                  ${isBoss ? '<span class="boss-tag">🔥 BOSS DO MÊS</span><br>' : ''}
+                  <strong style="font-size: 22px;">${bill.name}</strong>
+                  <div style="color: #aaa; font-size: 16px;">Vencimento: ${bill.due} | HP do Monstro: <strong style="color: var(--gold);">R$ ${bill.amount.toFixed(2)}</strong></div>
+                  ${isBoss ? `<div class="bar-bg" style="height: 8px; margin-top: 4px;"><div class="bar-fill hp-fill" style="width: 100%;"></div></div>` : ''}
+                </div>
+              </div>
+              <button class="btn-rpg btn-pay" onclick="payBill(${bill.id}, this)">⚔️ ATACAR (PAGAR)</button>
+            </div>
+          `;
+        }).join("");
+      }
+
+      // Renderizar Forja na Taverna
+      const forgeContainer = document.getElementById("forge-list");
+      forgeContainer.innerHTML = Object.keys(state.forge).map(key => {
+        const item = state.forge[key];
+        const nextCost = item.baseCost * (item.level + 1);
+        return `
+          <div class="shop-item">
+            <div>
+              <strong class="pixel-font" style="font-size: 10px; color: var(--gold);">${item.name} (LVL ${item.level})</strong>
+              <p style="margin-top: 6px;">Melhora o visual no seu acampamento a cada nível forjado.</p>
+            </div>
+            <button class="btn-rpg btn-gold" onclick="upgradeForge('${key}')">
+              ${item.level === 0 ? 'COMPRAR' : 'FORJAR LVL ' + (item.level + 1)} (${nextCost} GOLD)
+            </button>
+          </div>
+        `;
+      }).join("");
+
+      document.getElementById("input-budget").value = state.budget;
+      renderMerchant();
+    }
+
+    function switchTab(tab) {
+      ["dungeon", "tavern", "stats"].forEach(t => {
+        document.getElementById(`tab-${t}`).classList.toggle("hidden", t !== tab);
+        document.getElementById(`tab-btn-${t}`).classList.toggle("active", t === tab);
+      });
+    }
+
+    // ================= FUNÇÕES DO MODO TESTE (RODAPÉ) =================
+    function devBoost() {
+      gainXPAndGold(120, 250, document.querySelector(".dev-bar"), true);
+    }
+
+    function resetGame() {
+      localStorage.removeItem("rpg_finance_state");
+      state = JSON.parse(JSON.stringify(defaultState));
+      renderAll();
+      setSpeech("Progresso resetado! Pronto para uma nova jornada financeira!");
+    }
+
+    // Inicializar
+    renderAll();
+  </script>
+</body>
+</html>
