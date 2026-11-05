@@ -1,934 +1,967 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cozy Pixel RPG - Finanças</title>
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg-dark: #121420;
-      --panel-bg: #1a1d2e;
-      --border-gold: #f3be3b;
-      --gold: #ffcc00;
-      --green-xp: #2ee672;
-      --red-hp: #ff3355;
-      --blue-mp: #22aaff;
-      --purple-epic: #a855f7;
-      --text-main: #f3f4f6;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contas do mês</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#1f5f5b">
+<style>
+:root{--h:45;--bg:hsl(var(--h) 75% 89%);--card:hsl(var(--h) 70% 96%);--ink:hsl(var(--h) 30% 14%);--mut:hsl(var(--h) 18% 36%);--line:hsl(var(--h) 45% 75%);--acc:hsl(var(--h) 60% 26%);--ok:#2e7d4f;--bad:#b3392b;--warn:#c98a00}
+@media (prefers-color-scheme:dark){:root{--bg:hsl(var(--h) 28% 11%);--card:hsl(var(--h) 24% 16%);--ink:hsl(var(--h) 40% 92%);--mut:hsl(var(--h) 14% 66%);--line:hsl(var(--h) 20% 28%);--acc:hsl(var(--h) 65% 70%);--ok:#7bd19a;--bad:#ff8c7d;--warn:#ffd25e}}
+body{transition:background .3s}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:env(safe-area-inset-top) 0 90px}
+main{max-width:560px;margin:0 auto;padding:12px}
+button{font:inherit;color:inherit;cursor:pointer}
+.nav{display:flex;align-items:center;justify-content:space-between;margin:4px 0 12px}
+.nav h1{font-size:1.3rem;margin:0;text-transform:capitalize}
+.nav button{background:var(--card);border:1px solid var(--line);border-radius:10px;width:44px;height:44px;font-size:1.2rem}
+.sum{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}
+.sum .row{display:flex;justify-content:space-between;padding:3px 0}
+.sum .row b{font-variant-numeric:tabular-nums}
+.sum .big{font-size:1.25rem;border-top:1px solid var(--line);margin-top:6px;padding-top:8px}
+.pos{color:var(--ok)}.neg{color:var(--bad)}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin:8px 0 2px}
+.bar i{display:block;height:100%;background:var(--ok)}
+h2{font-size:1rem;margin:18px 4px 6px;color:var(--mut);font-weight:600}
+.item{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:6px}
+.item input[type=checkbox]{width:26px;height:26px;accent-color:var(--ok);flex:none}
+.item .t{flex:1;min-width:0;text-align:left;background:none;border:0;padding:0}
+.item .n{display:block;overflow-wrap:anywhere;font-weight:500}
+.item small{color:var(--mut)}
+.item .v{font-variant-numeric:tabular-nums;font-weight:600}
+.item.done .n,.item.done .v{text-decoration:line-through;opacity:.55}
+.tag{display:inline-block;background:var(--line);border-radius:6px;padding:1px 6px;margin-right:4px;font-size:.78rem;color:var(--ink)}
+.empty{color:var(--mut);text-align:center;padding:14px}
+.add{background:var(--acc);color:var(--bg);border:0;border-radius:10px;padding:10px 14px;font-weight:600}
+.fab{position:fixed;right:max(16px,calc(50% - 264px));bottom:calc(16px + env(safe-area-inset-bottom));background:var(--acc);color:var(--bg);border:0;border-radius:28px;padding:0 22px;height:52px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.25);z-index:20}
+.fab-adv{position:fixed;left:max(16px,calc(50% - 264px));bottom:calc(16px + env(safe-area-inset-bottom));background:var(--card);color:var(--ink);border:2px solid var(--acc);border-radius:28px;padding:0 16px;height:52px;font-weight:700;box-shadow:0 4px 14px rgba(0,0,0,.2);display:flex;align-items:center;gap:6px;z-index:20}
+dialog{border:0;border-radius:16px;background:var(--card);color:var(--ink);width:min(94vw,440px);padding:18px}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+label{display:block;margin:10px 0 4px;font-size:.9rem;color:var(--mut)}
+input[type=text],input[type=number],input[type=month],input[type=password],select{width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btns{display:flex;gap:8px;margin-top:16px}
+.btns button{flex:1;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--bg)}
+.btns .save{background:var(--acc);color:var(--bg);border:0;font-weight:700}
+.btns .del{color:var(--bad)}
+.hint{font-size:.85rem;color:var(--mut);margin-top:6px}
+.inc{display:flex;gap:6px;margin-top:6px}.inc input{flex:1}
+.x{background:none;border:0;color:var(--bad);font-size:1.2rem;width:36px}
+.alerta{border-radius:12px;padding:10px 12px;margin-bottom:10px;font-weight:600;border:1px solid var(--warn);background:color-mix(in srgb,var(--warn) 24%,var(--card))}
+.alerta.r{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 20%,var(--card))}
+.alerta .add{margin-left:6px;padding:6px 10px}
+.item.late{border-left:6px solid var(--bad);background:color-mix(in srgb,var(--bad) 14%,var(--card))}
+.item.soon{border-left:6px solid var(--warn);background:color-mix(in srgb,var(--warn) 20%,var(--card))}
+.chk{display:flex;gap:8px;align-items:center;color:var(--ink);margin:8px 0}.chk input{width:22px;height:22px;accent-color:var(--acc)}
+summary{cursor:pointer;font-weight:600;padding:2px 0}
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-      /* Mantém os pixels nítidos e redondinhos, sem borrar */
-      image-rendering: pixelated;
-      image-rendering: crisp-edges;
-    }
+/* ---- Estilos do Gráfico de Rosca e Ícones de Categoria ---- */
+.donut-wrap{display:flex;flex-direction:column;align-items:center;gap:14px}
+.donut-box{position:relative;width:190px;height:190px;display:flex;align-items:center;justify-content:center}
+.donut-svg{width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
+.donut-slice{fill:none;stroke-width:26;cursor:pointer;transition:opacity .2s,stroke-width .2s}
+.donut-slice:hover,.donut-slice.active{stroke-width:31}
+.donut-center{position:absolute;text-align:center;pointer-events:none;width:122px;line-height:1.2}
+.donut-center small{display:block;font-size:.76rem;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.donut-center b{display:block;font-size:1.05rem;font-variant-numeric:tabular-nums;margin-top:2px}
+.leg-grid{width:100%;display:grid;grid-template-columns:1fr;gap:6px}
+.leg-item{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-radius:10px;background:var(--bg);border:1px solid transparent;cursor:pointer;font-size:.88rem;text-align:left;width:100%}
+.leg-item.active{border-color:var(--acc);font-weight:700;box-shadow:0 0 0 1px var(--acc)}
+.leg-left{display:flex;align-items:center;gap:7px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.leg-dot{width:11px;height:11px;border-radius:50%;flex:none}
+.leg-val{font-variant-numeric:tabular-nums;color:var(--mut);font-size:.82rem;margin-left:8px;white-space:nowrap}
+.cat-ico{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex:none}
+.filter-pill{display:flex;align-items:center;justify-content:space-between;background:color-mix(in srgb,var(--acc) 15%,var(--card));border:1px solid var(--acc);border-radius:10px;padding:8px 12px;margin:10px 0;font-size:.88rem}
+.filter-pill button{background:none;border:0;color:var(--acc);font-weight:700;padding:2px 6px}
 
-    body {
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 15px;
-      padding-bottom: 90px;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    .pixel-title {
-      font-family: 'Press Start 2P', monospace;
-      text-transform: uppercase;
-      font-size: 11px;
-    }
-
-    /* Moldura Estilo RPG Retrô Refinado */
-    .rpg-panel {
-      background: var(--panel-bg);
-      border: 3px solid #3d446b;
-      box-shadow: inset 0 0 0 2px #121420, 0 6px 0 rgba(0,0,0,0.4);
-      border-radius: 8px;
-      padding: 16px;
-      margin-bottom: 16px;
-      position: relative;
-    }
-
-    .container {
-      max-width: 780px;
-      margin: 0 auto;
-      padding: 12px;
-    }
-
-    /* HUD Fixo no Topo */
-    .hud-top {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(18, 20, 32, 0.95);
-      backdrop-filter: blur(8px);
-      border-bottom: 3px solid var(--border-gold);
-      padding: 10px 14px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
-    }
-
-    .hud-grid {
-      max-width: 780px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 10px;
-      align-items: center;
-    }
-
-    .stat-box {
-      background: #151828;
-      border: 2px solid #2d334f;
-      border-radius: 6px;
-      padding: 6px 10px;
-    }
-
-    .stat-header {
-      display: flex;
-      justify-content: space-between;
-      font-size: 10px;
-      font-family: 'Press Start 2P', monospace;
-      margin-bottom: 4px;
-      color: #9ca3af;
-    }
-
-    .bar-bg {
-      width: 100%;
-      height: 10px;
-      background: #0b0d17;
-      border: 2px solid #2d334f;
-      border-radius: 3px;
-      overflow: hidden;
-    }
-
-    .bar-fill {
-      height: 100%;
-      transition: width 0.4s ease;
-    }
-
-    .hp-fill { background: var(--red-hp); }
-    .mp-fill { background: var(--blue-mp); }
-    .xp-fill { background: var(--gold); }
-
-    .gold-badge {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 11px;
-      color: var(--gold);
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 8px;
-    }
-
-    /* Santuário Pixel Art Confortável */
-    .sanctuary-scene {
-      background: linear-gradient(180deg, #1b1f38 0%, #131526 70%, #0d121c 100%);
-      min-height: 250px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: space-between;
-      border: 3px solid #4f5d96;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .ambient-glow {
-      position: absolute;
-      width: 180px;
-      height: 180px;
-      border-radius: 50%;
-      top: 35px;
-      filter: blur(25px);
-      opacity: 0.35;
-      pointer-events: none;
-      transition: background 0.5s ease;
-    }
-
-    .dialog-box {
-      background: #fff;
-      color: #121420;
-      border: 3px solid #121420;
-      box-shadow: 3px 3px 0 rgba(0,0,0,0.5);
-      padding: 8px 12px;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 9px;
-      line-height: 1.5;
-      max-width: 90%;
-      text-align: center;
-      z-index: 5;
-    }
-
-    .stage-floor {
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      gap: 28px;
-      width: 100%;
-      padding: 8px 0;
-      z-index: 5;
-      border-bottom: 4px solid #232946;
-    }
-
-    .guardian-pixel-wrapper {
-      width: 100px;
-      height: 100px;
-      animation: floatIdle 2s infinite ease-in-out;
-      position: relative;
-    }
-
-    @keyframes floatIdle {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
-    }
-
-    .decor-pixel-slot {
-      width: 56px;
-      height: 56px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-end;
-      position: relative;
-    }
-
-    .item-lvl-tag {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 7px;
-      background: #0d0f1a;
-      color: var(--gold);
-      border: 1px solid var(--gold);
-      padding: 1px 4px;
-      margin-top: -4px;
-    }
-
-    /* Abas de Navegação */
-    .nav-tabs {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .btn-rpg {
-      background: #252a42;
-      color: #fff;
-      border: 2px solid #434c75;
-      border-radius: 6px;
-      padding: 10px 6px;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 9px;
-      cursor: pointer;
-      box-shadow: 0 4px 0 #121420;
-      transition: all 0.1s;
-    }
-
-    .btn-rpg:active {
-      transform: translateY(3px);
-      box-shadow: 0 1px 0 #121420;
-    }
-
-    .btn-rpg.active {
-      background: var(--gold);
-      color: #121420;
-      border-color: #fff;
-      box-shadow: 0 4px 0 #997a00;
-    }
-
-    .btn-action {
-      background: var(--green-xp);
-      color: #121420;
-      border-color: #fff;
-      box-shadow: 0 4px 0 #13853d;
-    }
-
-    .btn-gold {
-      background: var(--gold);
-      color: #121420;
-      border-color: #fff;
-      box-shadow: 0 4px 0 #997a00;
-    }
-
-    /* Inputs */
-    .form-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr auto;
-      gap: 8px;
-    }
-
-    @media (max-width: 600px) {
-      .form-grid { grid-template-columns: 1fr; }
-    }
-
-    input {
-      background: #111320;
-      border: 2px solid #3d446b;
-      border-radius: 6px;
-      color: #fff;
-      padding: 8px 10px;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 15px;
-      font-weight: 600;
-      outline: none;
-    }
-
-    input:focus {
-      border-color: var(--gold);
-    }
-
-    /* Contas / Monstros */
-    .monster-row {
-      background: #151828;
-      border: 2px solid #2d334f;
-      border-radius: 6px;
-      padding: 12px;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .monster-row.boss {
-      background: linear-gradient(90deg, rgba(255, 51, 85, 0.15) 0%, #151828 100%);
-      border-color: var(--red-hp);
-    }
-
-    .monster-avatar {
-      width: 48px;
-      height: 48px;
-      flex-shrink: 0;
-    }
-
-    .boss-tag {
-      font-family: 'Press Start 2P', monospace;
-      font-size: 7px;
-      background: var(--red-hp);
-      color: #fff;
-      padding: 2px 6px;
-      border-radius: 3px;
-      display: inline-block;
-      margin-bottom: 4px;
-    }
-
-    .hit-anim {
-      animation: monsterDamage 0.4s ease forwards;
-    }
-
-    @keyframes monsterDamage {
-      0% { transform: scale(1); filter: brightness(1); }
-      30% { transform: scale(1.1) translateX(-4px); filter: brightness(3) invert(0.2); }
-      100% { transform: scale(0.4); opacity: 0; }
-    }
-
-    .floating-text {
-      position: fixed;
-      font-family: 'Press Start 2P', monospace;
-      font-size: 11px;
-      color: var(--gold);
-      text-shadow: 2px 2px 0 #000;
-      pointer-events: none;
-      z-index: 9999;
-      animation: floatUp 1s ease-out forwards;
-    }
-
-    @keyframes floatUp {
-      0% { opacity: 1; transform: translateY(0) scale(0.9); }
-      100% { opacity: 0; transform: translateY(-50px) scale(1.1); }
-    }
-
-    .shop-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-      gap: 12px;
-      margin-top: 12px;
-    }
-
-    .shop-card {
-      background: #151828;
-      border: 2px solid #3d446b;
-      border-radius: 6px;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    .dev-footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(11, 13, 23, 0.95);
-      border-top: 2px dashed #2d334f;
-      padding: 8px 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      z-index: 200;
-      font-size: 13px;
-    }
-
-    .hidden { display: none; }
-  </style>
+/* ---- Estilos do Chat Conselheiro Financeiro ---- */
+#dlgChat{width:min(96vw,480px);max-height:88vh;padding:0;overflow:hidden}
+.chat-wrap{display:flex;flex-direction:column;height:min(82vh,640px)}
+.chat-head{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--bg)}
+.chat-head-left{display:flex;align-items:center;gap:10px}
+.adv-avatar{width:38px;height:38px;border-radius:50%;background:var(--acc);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:1.25rem;flex:none}
+.chat-head h3{margin:0;font-size:1rem}
+.chat-head small{color:var(--mut);font-size:.76rem;display:block}
+.chat-head-btns{display:flex;gap:6px}
+.icon-btn{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:.82rem}
+.chat-cfg{padding:10px 14px;background:color-mix(in srgb,var(--acc) 10%,var(--card));border-bottom:1px solid var(--line);font-size:.82rem}
+.chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.msg-bub{max-width:88%;padding:10px 13px;border-radius:14px;font-size:.92rem;line-height:1.45;word-wrap:break-word}
+.msg-adv{align-self:flex-start;background:var(--bg);border:1px solid var(--line);border-bottom-left-radius:4px}
+.msg-usr{align-self:flex-end;background:var(--acc);color:var(--bg);border-bottom-right-radius:4px;font-weight:500}
+.msg-adv ul{margin:6px 0 2px;padding-left:18px}
+.msg-adv li{margin-bottom:4px}
+.chat-chips{display:flex;gap:6px;overflow-x:auto;padding:8px 12px;border-top:1px solid var(--line);background:var(--card);scrollbar-width:none}
+.chat-chips::-webkit-scrollbar{display:none}
+.chip-q{flex:none;background:var(--bg);border:1px solid var(--line);border-radius:99px;padding:6px 11px;font-size:.78rem;font-weight:600;white-space:nowrap}
+.chip-q:active{background:var(--acc);color:var(--bg)}
+.chat-foot{display:flex;gap:6px;padding:10px 12px;border-top:1px solid var(--line);background:var(--bg)}
+.chat-foot input{flex:1;margin:0}
+</style>
 </head>
 <body>
-
-  <!-- HUD TOPO -->
-  <header class="hud-top">
-    <div class="hud-grid">
-      <div class="stat-box">
-        <div class="stat-header">
-          <span>❤️ HP ORÇAMENTO</span>
-          <span id="hp-text">100%</span>
-        </div>
-        <div class="bar-bg"><div id="hp-bar" class="bar-fill hp-fill" style="width: 100%;"></div></div>
-      </div>
-
-      <div class="stat-box">
-        <div class="stat-header">
-          <span>💧 MP RESERVA</span>
-          <span id="mp-text">R$ 300</span>
-        </div>
-        <div class="bar-bg"><div id="mp-bar" class="bar-fill mp-fill" style="width: 25%;"></div></div>
-      </div>
-
-      <div class="stat-box">
-        <div class="stat-header">
-          <span id="lvl-text" style="color: var(--gold);">LVL 1</span>
-          <span id="xp-text">0/100 XP</span>
-        </div>
-        <div class="bar-bg"><div id="xp-bar" class="bar-fill xp-fill" style="width: 0%;"></div></div>
-      </div>
-
-      <div class="gold-badge">
-        <span id="elixir-indicator" style="font-size: 8px; color: var(--purple-epic);"></span>
-        <span>🪙 <span id="gold-text">100</span></span>
-        <button class="btn-rpg" style="padding: 4px 8px;" onclick="toggleMute()" id="mute-btn">🔊</button>
-      </div>
-    </div>
-  </header>
-
-  <div class="container">
-
-    <!-- SANTUÁRIO DO GATO GUARDIÃO (PIXEL ART REFINADA) -->
-    <section class="rpg-panel sanctuary-scene">
-      <div id="ambient-aura" class="ambient-glow"></div>
-
-      <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; z-index: 5;">
-        <span id="class-title" class="pixel-title" style="color: var(--gold); font-size: 9px;">Classe: Gato Aprendiz</span>
-        <span id="noble-title" style="font-size: 11px; color: var(--purple-epic); font-weight: 700;">Guardião de Contas</span>
-      </div>
-
-      <div id="guardian-speech" class="dialog-box">
-        "Pague uma conta em dia para causar Dano Crítico e ganhar XP em dobro!"
-      </div>
-
-      <div class="stage-floor">
-        <!-- Slot Esquerdo: Fogueira / Lampião Pixel Art -->
-        <div class="decor-pixel-slot" id="slot-campfire"></div>
-
-        <!-- O Gato Guardião em Pixel Art Fofa e Detalhada -->
-        <div class="guardian-pixel-wrapper" id="guardian-pixel-art"></div>
-
-        <!-- Slot Direito: Baú Pixel Art -->
-        <div class="decor-pixel-slot" id="slot-chest"></div>
-      </div>
-    </section>
-
-    <!-- NAVEGAÇÃO -->
-    <nav class="nav-tabs">
-      <button class="btn-rpg active" id="tab-btn-dungeon" onclick="switchTab('dungeon')">⚔️ Masmorra</button>
-      <button class="btn-rpg" id="tab-btn-tavern" onclick="switchTab('tavern')">🍺 Taverna & Forja</button>
-      <button class="btn-rpg" id="tab-btn-stats" onclick="switchTab('stats')">📜 Livro-Caixa</button>
-    </nav>
-
-    <!-- ABA 1: MASMORRA -->
-    <main id="tab-dungeon">
-      <div class="rpg-panel">
-        <h3 class="pixel-title" style="font-size: 10px; color: var(--gold); margin-bottom: 12px;">Invocador de Contas (Boletos)</h3>
-        <div class="form-grid">
-          <input type="text" id="bill-name" placeholder="Nome da conta (ex: Aluguel, Luz)...">
-          <input type="number" id="bill-amount" placeholder="Valor (R$)">
-          <input type="date" id="bill-due">
-          <button class="btn-rpg btn-action" onclick="addBill()">+ Invocar</button>
-        </div>
-      </div>
-
-      <div class="rpg-panel">
-        <h3 class="pixel-title" style="font-size: 10px; margin-bottom: 12px;">Monstros Pendentes deste Mês</h3>
-        <div id="monsters-list"></div>
-      </div>
-    </main>
-
-    <!-- ABA 2: TAVERNA & FORJA -->
-    <section id="tab-tavern" class="hidden">
-      <div class="rpg-panel">
-        <h3 class="pixel-title" style="font-size: 10px; color: var(--gold);">⚒️ Forja e Aprimoramento de Acampamento</h3>
-        <p style="font-size: 13px; color: #9ca3af; margin-top: 4px;">Aumente o nível dos itens para mudar suas cores e chamas no santuário.</p>
-        <div class="shop-grid" id="forge-list"></div>
-      </div>
-
-      <div class="rpg-panel">
-        <h3 class="pixel-title" style="font-size: 10px; color: var(--purple-epic);">🧪 Alquimia e Baú Misterioso</h3>
-        <div class="shop-grid">
-          <div class="shop-card">
-            <div>
-              <strong class="pixel-title" style="font-size: 9px; color: var(--green-xp);">Elixir de Sabedoria</strong>
-              <p style="font-size: 13px; color: #9ca3af; margin-top: 6px;">Dobra o XP ganho nas próximas 3 contas pagas.</p>
-            </div>
-            <button class="btn-rpg btn-gold" onclick="buyElixir()">Comprar (80 🪙)</button>
-          </div>
-
-          <div class="shop-card">
-            <div>
-              <strong class="pixel-title" style="font-size: 9px; color: var(--blue-mp);">Poção de Vitalidade</strong>
-              <p style="font-size: 13px; color: #9ca3af; margin-top: 6px;">Restaura +25% do HP do seu orçamento mensal.</p>
-            </div>
-            <button class="btn-rpg btn-gold" onclick="buyHeal()">Comprar (60 🪙)</button>
-          </div>
-
-          <div class="shop-card" style="border-color: var(--purple-epic);">
-            <div>
-              <strong class="pixel-title" style="font-size: 9px; color: var(--purple-epic);">🎁 Baú Gacha Raro</strong>
-              <p style="font-size: 13px; color: #9ca3af; margin-top: 6px;">Sorteia títulos nobres e auras místicas para o perfil.</p>
-            </div>
-            <button class="btn-rpg" style="background: var(--purple-epic); color: #fff;" onclick="rollGacha()">Abrir (150 🪙)</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ABA 3: LIVRO-CAIXA -->
-    <section id="tab-stats" class="hidden">
-      <div class="rpg-panel">
-        <h3 class="pixel-title" style="font-size: 10px; color: var(--gold); margin-bottom: 12px;">Configurar Orçamento & Reserva</h3>
-        <div style="display: grid; gap: 12px;">
-          <div>
-            <label style="font-size: 13px; font-weight: 700;">Orçamento Mensal Total (R$):</label><br>
-            <input type="number" id="input-budget" style="width: 100%; margin-top: 4px;" onchange="updateFinanceConfig()">
-          </div>
-          <div>
-            <label style="font-size: 13px; font-weight: 700;">Guardar na Reserva (Enche o MP e dá XP):</label>
-            <div style="display: flex; gap: 8px; margin-top: 4px;">
-              <input type="number" id="input-mana-add" placeholder="Valor guardado (R$)" style="flex: 1;">
-              <button class="btn-rpg" style="background: var(--blue-mp); color: #121420;" onclick="addManaSavings()">+ Guardar MP</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
+<main>
+  <div id="alerta"></div><div id="lembrete"></div>
+  <div class="nav">
+    <button id="prev" aria-label="Mês anterior">‹</button>
+    <h1 id="mesTitulo"></h1>
+    <button id="next" aria-label="Próximo mês">›</button>
   </div>
 
-  <!-- RODAPÉ TESTE -->
-  <footer class="dev-footer">
-    <span>✨ <strong>Modo Teste:</strong> Clique para ver o gato evoluir trajes e espada!</span>
-    <div style="display: flex; gap: 8px;">
-      <button class="btn-rpg btn-gold" onclick="devBoost()">+120 XP / +250 🪙</button>
-      <button class="btn-rpg" style="background: var(--red-hp); color: #fff;" onclick="resetGame()">Reset</button>
+  <section class="sum" id="resumo"></section>
+  <div id="cats"></div>
+  <section class="sum" id="metaBox"></section>
+
+  <h2>Recebimentos</h2>
+  <div id="recebs"></div>
+  <div class="inc">
+    <input type="text" id="rNome" placeholder="Ex.: Salário" aria-label="Descrição do recebimento">
+    <input type="text" id="rValor" inputmode="decimal" placeholder="R$ 0,00" style="max-width:120px" aria-label="Valor recebido">
+    <button class="add" id="rAdd">Incluir</button>
+  </div>
+  <label class="chk"><input type="checkbox" id="rFixo"> Fixo (repete todo mês)</label>
+
+  <div id="lista"></div>
+  <div id="ano"></div>
+
+  <h2>Backup dos dados</h2>
+  <div class="inc">
+    <button class="add" id="bExp">Exportar backup</button>
+    <button class="add" id="bImp" style="background:var(--card);color:var(--ink);border:1px solid var(--line)">Importar backup</button>
+    <input type="file" id="bFile" accept=".json,application/json" hidden>
+  </div>
+  <p class="hint" id="bMsg">Exporte de vez em quando e guarde o arquivo (ex.: no Google Drive).</p>
+</main>
+
+<button class="fab-adv" id="btnConselheiro" aria-label="Abrir Conselheiro Financeiro">💼 Conselheiro</button>
+<button class="fab" id="novo">+ Nova conta</button>
+
+<!-- MODAL: NOVA / EDITAR CONTA -->
+<dialog id="dlg">
+  <form id="form" novalidate>
+    <h3 id="dlgTitulo" style="margin:0">Nova conta</h3>
+    <label for="fNome">Nome</label>
+    <input type="text" id="fNome" required placeholder="Ex.: Cartão Itaú, Vivo, Aluguel...">
+    <p class="hint" id="catSugHint" style="margin:4px 0 0;color:var(--ok);display:none"></p>
+    <div class="two">
+      <div><label for="fValor">Valor (R$)</label><input type="text" id="fValor" inputmode="decimal" required placeholder="0,00"></div>
+      <div><label for="fDia">Dia do vencimento</label><input type="number" id="fDia" min="1" max="31" value="15"></div>
     </div>
-  </footer>
+    <label for="fMes">Mês de vencimento</label>
+    <input type="month" id="fMes" required>
+    <label for="fTipo">Tipo</label>
+    <select id="fTipo">
+      <option value="unica">Só neste mês</option>
+      <option value="fixa">Fixa (repete todo mês)</option>
+      <option value="parcelada">Parcelada</option>
+    </select>
+    <label for="fCat">Categoria</label>
+    <select id="fCat"></select>
+    <div class="inc"><input type="text" id="fCatNova" placeholder="Nova categoria (ex.: Academia)" aria-label="Nome da nova categoria"><button type="button" class="add" id="fCatAdd">Criar</button></div>
+    <div id="parcBox" hidden>
+      <div class="two">
+        <div><label for="fTotal">Total de parcelas</label><input type="number" id="fTotal" min="2" value="2"></div>
+        <div><label for="fPagas">Já pagas antes deste mês</label><input type="number" id="fPagas" min="0" value="0"></div>
+      </div>
+      <p class="hint" id="parcHint"></p>
+    </div>
+    <p class="hint neg" id="msg" role="alert"></p>
+    <div class="btns">
+      <button type="button" id="cancelar">Cancelar</button>
+      <button type="button" class="del" id="excluir" hidden>Excluir</button>
+      <button type="button" class="save" id="salvar">Salvar</button>
+    </div>
+  </form>
+</dialog>
 
-  <script>
-    const defaultState = {
-      xp: 0,
-      level: 1,
-      gold: 120,
-      budget: 3500,
-      manaSaved: 400,
-      hpBonus: 0,
-      elixirCharges: 0,
-      nobleTitle: "Guardião de Contas",
-      auraColor: "rgba(255, 204, 0, 0.2)",
-      muted: false,
-      forge: {
-        campfire: { level: 0, name: "Fogueira Mística", baseCost: 50 },
-        chest: { level: 0, name: "Baú de Tesouro", baseCost: 80 }
-      },
-      bills: [
-        { id: 1, name: "Fatura Cartão (Goblin)", amount: 1150, due: "2026-11-20", paid: false },
-        { id: 2, name: "Internet Fibra", amount: 120, due: "2026-11-15", paid: false },
-        { id: 3, name: "Conta de Luz", amount: 175, due: "2026-11-10", paid: false }
-      ]
-    };
+<!-- MODAL: RECEBIMENTO FIXO -->
+<dialog id="dlgR">
+  <h3 style="margin:0">Recebimento fixo</h3>
+  <label for="eNome">Descrição</label><input type="text" id="eNome">
+  <label for="eVal">Valor (R$)</label><input type="text" id="eVal" inputmode="decimal">
+  <p class="hint" id="eHint"></p>
+  <div class="btns" style="flex-wrap:wrap"><button type="button" id="eCan">Cancelar</button><button type="button" class="del" id="eDel">Remover daqui pra frente</button><button type="button" class="save" id="eSave">Salvar daqui pra frente</button></div>
+</dialog>
 
-    let state = JSON.parse(localStorage.getItem("cozy_pixel_rpg_state")) || defaultState;
+<!-- MODAL: META DE POUPANÇA -->
+<dialog id="dlgM">
+  <h3 style="margin:0">Meta de poupança</h3>
+  <label for="mNome">Nome da meta</label><input type="text" id="mNome">
+  <div class="two"><div><label for="mAlvo">Valor-alvo (R$)</label><input type="text" id="mAlvo" inputmode="decimal"></div>
+  <div><label for="mMensal">Guardar por mês (R$)</label><input type="text" id="mMensal" inputmode="decimal"></div></div>
+  <label for="mInicio">Mês inicial</label><input type="month" id="mInicio">
+  <div class="btns" style="flex-wrap:wrap"><button type="button" id="mCan">Fechar</button><button type="button" class="del" id="mDel" hidden>Excluir meta</button><button type="button" class="save" id="mSave">Salvar meta</button></div>
+  <h4 style="margin:18px 0 0">Aporte extra (ex.: rescisão)</h4>
+  <div class="two"><div><label for="xNome">Descrição</label><input type="text" id="xNome"></div><div><label for="xVal">Valor (R$)</label><input type="text" id="xVal" inputmode="decimal"></div></div>
+  <label for="xMes">Mês do aporte</label><input type="month" id="xMes">
+  <div class="btns"><button type="button" class="save" id="xAdd">Incluir aporte</button></div>
+  <p class="hint neg" id="mMsg" role="alert"></p>
+  <div id="xLista"></div>
+</dialog>
 
-    function saveState() {
-      localStorage.setItem("cozy_pixel_rpg_state", JSON.stringify(state));
-      renderAll();
+<!-- MODAL: CHAT CONSELHEIRO FINANCEIRO -->
+<dialog id="dlgChat">
+  <div class="chat-wrap">
+    <div class="chat-head">
+      <div class="chat-head-left">
+        <div class="adv-avatar">💼</div>
+        <div>
+          <h3>Conselheiro Financeiro</h3>
+          <small id="advStatus">Analisando suas contas de <span id="advMesNome"></span></small>
+        </div>
+      </div>
+      <div class="chat-head-btns">
+        <button type="button" class="icon-btn" id="btnToggleApi" title="Configurar chave de IA opcional">⚙️ IA</button>
+        <button type="button" class="icon-btn" id="btnFecharChat">✕</button>
+      </div>
+    </div>
+
+    <div class="chat-cfg" id="boxApiCfg" hidden>
+      <strong>Modo IA Avançado (Opcional):</strong>
+      <p style="margin:4px 0">O conselheiro já funciona 100% grátis no modo analítico local. Se quiser respostas abertas via Gemini AI, cole sua chave gratuita do Google AI Studio abaixo:</p>
+      <div class="inc">
+        <input type="password" id="inpApiKey" placeholder="Cole sua Gemini API Key (AIza...)">
+        <button type="button" class="add" id="btnSaveKey" style="padding:8px 12px">Salvar</button>
+      </div>
+    </div>
+
+    <div class="chat-msgs" id="chatMsgs"></div>
+
+    <div class="chat-chips">
+      <button type="button" class="chip-q" data-q="Diagnóstico completo do meu mês">📊 Diagnóstico do mês</button>
+      <button type="button" class="chip-q" data-q="Qual dívida ou conta devo priorizar primeiro?">🎯 O que priorizar?</button>
+      <button type="button" class="chip-q" data-q="Onde consigo cortar gastos neste mês?">✂️ Onde cortar gastos?</button>
+      <button type="button" class="chip-q" data-q="Vale a pena antecipar minhas contas parceladas?">💳 Análise de parcelas</button>
+      <button type="button" class="chip-q" data-q="Quanto posso gastar com lazer sem ficar no vermelho?">🎮 Limite para lazer</button>
+    </div>
+
+    <form class="chat-foot" id="formChat">
+      <input type="text" id="chatInput" placeholder="Pergunte sobre suas contas, dívidas ou metas..." autocomplete="off">
+      <button type="submit" class="add">Enviar</button>
+    </form>
+  </div>
+</dialog>
+
+<script>
+const KEY = 'contas-do-mes-v1';
+const KEY_API = 'contas-gemini-key';
+let db = load();
+let mes = hoje();            // 'AAAA-MM'
+let editId = null, semSalvar = false;
+let catFiltro = null;
+let catManual = false;
+
+/* ---- Configuração Visual e Inteligente das Categorias ---- */
+const CAT_META = {
+  'Moradia':          { ico: '🏠', cor: '#e67e22', kw: ['aluguel','condominio','condomínio','iptu','gas','gás','reforma','casa','moradia','apto','apartamento'] },
+  'Transporte':       { ico: '🚗', cor: '#3b82f6', kw: ['uber','99','bilhete','metro','metrô','cptm','onibus','ônibus','gasolina','combustivel','combustível','ipiranga','estacionamento','pedagio','pedágio','transporte'] },
+  'Alimentação':      { ico: '🍽️', cor: '#10b981', kw: ['ifood','mercado','supermercado','padaria','restaurante','lanche','acougue','açougue','feira','cafe','café','alimentacao','alimentação','pizza','burger'] },
+  'Lazer':            { ico: '🎮', cor: '#a855f7', kw: ['psn','playstation','ps5','steam','nintendo','switch','jogo','game','cinema','show','festa','festival','ingresso','sympla','zig','blacktag','viagem','airbnb','bar','lazer'] },
+  'Faculdade':        { ico: '🎓', cor: '#06b6d4', kw: ['faculdade','universidade','cruzeiro','mensalidade','curso','livro','xerox','apostila','pos','pós','mba','estudo'] },
+  'Cartão de crédito':{ ico: '💳', cor: '#ef4444', kw: ['itau','itaú','nubank','bradesco','santander','inter','c6','cartao','cartão','fatura','mastercard','visa','xp','picpay','mercadopago'] },
+  'Contas':           { ico: '📱', cor: '#ec4899', kw: ['vivo','claro','tim','oi','luz','enel','energia','agua','água','sabesp','internet','fibra','telefone','celular','netflix','spotify','amazon','kindle','streaming'] },
+  'Poupança':         { ico: '🐷', cor: '#14b8a6', kw: ['poupanca','poupança','reserva','meta','investimento'] },
+  'Outros':           { ico: '📌', cor: '#64748b', kw: [] }
+};
+const EXTRA_COLORS = ['#8b5cf6','#f43f5e','#84cc16','#0ea5e9','#d97706'];
+
+function getCatMeta(c){
+  if (!c) return { nome:'Sem categoria', ico:'📄', cor:'#94a3b8' };
+  const k = Object.keys(CAT_META).find(x=>x.toLowerCase()===c.toLowerCase());
+  if (k) return { nome:k, ...CAT_META[k] };
+  let h = 0; for(let i=0;i<c.length;i++) h = (h*31 + c.charCodeAt(i)) % EXTRA_COLORS.length;
+  return { nome:c, ico:'🏷️', cor:EXTRA_COLORS[h] };
+}
+
+function sugerirCategoriaPorNome(texto){
+  const limpo = String(texto||'').toLowerCase().trim();
+  if (!limpo) return null;
+  for (const [nomeCat, info] of Object.entries(CAT_META)){
+    if (info.kw && info.kw.some(w => limpo.includes(w))) return nomeCat;
+  }
+  return null;
+}
+
+function norm(d){ d=d&&typeof d==='object'?d:{}; d.itens=Array.isArray(d.itens)?d.itens:[]; d.receb=d.receb&&typeof d.receb==='object'?d.receb:{};
+  d.recFixos=Array.isArray(d.recFixos)?d.recFixos:[]; d.cats=Array.isArray(d.cats)?d.cats.filter(c=>typeof c==='string'):[]; d.meta=d.meta&&typeof d.meta==='object'?d.meta:null;
+  if(d.meta){ d.meta.pagos=d.meta.pagos||{}; d.meta.extras=Array.isArray(d.meta.extras)?d.meta.extras:[]; } return d; }
+function load(){ try{ return norm(JSON.parse(localStorage.getItem(KEY))) }catch(e){ return norm(null) } }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(db)) }catch(e){ semSalvar=true } }
+function hoje(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0') }
+const $ = id => document.getElementById(id);
+const brl = n => n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const esc = s => String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function num(s){
+  s = String(s).replace(/[R$\s]/g,'');
+  if (s.includes(',')) s = s.replace(/\./g,'').replace(',','.');
+  const n = parseFloat(s); return isNaN(n) ? 0 : Math.round(n*100)/100;
+}
+const idx = m => { const [a,b]=m.split('-').map(Number); return a*12+b-1 };
+function addMes(m,k){ const i=idx(m)+k; return Math.floor(i/12)+'-'+String(i%12+1).padStart(2,'0') }
+function nomeMes(m){ const [a,b]=m.split('-').map(Number); return new Date(a,b-1,1).toLocaleDateString('pt-BR',{month:'long',year:'numeric'}) }
+
+function infoNoMes(it, m){
+  const d = idx(m) - idx(it.mes);
+  if (it.tipo === 'unica') return d === 0 ? {} : null;
+  if (it.tipo === 'fixa')  return d >= 0 ? {} : null;
+  const atual = (it.pagasAntes||0) + d + 1;
+  if (d < 0 || atual > it.total) return null;
+  return { atual, faltam: it.total - atual };
+}
+const itensDoMes = m => { const l=db.itens.map(it=>({it,info:infoNoMes(it,m)})).filter(x=>x.info);
+  const mi=metaItem(m); if(mi) l.push({it:mi,info:{}}); return l.sort((a,b)=>a.it.dia-b.it.dia) };
+
+const HUES=[215,330,150,28,275,180,0,48,250,20,130,195];
+function render(){
+  document.documentElement.style.setProperty('--h', HUES[+mes.split('-')[1]-1]);
+  $('mesTitulo').textContent = nomeMes(mes);
+  const lista = itensDoMes(mes);
+  const total = lista.reduce((s,x)=>s+x.it.valor,0);
+  const pago  = lista.filter(x=>(x.it.pagos||{})[mes]).reduce((s,x)=>s+x.it.valor,0);
+  const recs  = recsDoMes(mes);
+  const recebido = recs.reduce((s,r)=>s+r.valor,0);
+  const saldo = recebido - total, saldoCaixa = recebido - pago;
+  const pct = total ? Math.round(pago/total*100) : 0;
+
+  $('resumo').innerHTML = (semSalvar?'<p class="hint neg">Este navegador bloqueou o salvamento: os dados somem ao fechar. Abra o arquivo direto no Chrome.</p>':'') + `
+    <div class="row"><span>Total a pagar</span><b>${brl(total)}</b></div>${cmpTxt(total)}
+    <div class="row"><span>Já pago</span><b class="pos">${brl(pago)}</b></div>
+    <div class="row"><span>Falta pagar</span><b>${brl(total-pago)}</b></div>
+    <div class="bar" aria-hidden="true"><i style="width:${pct}%"></i></div>
+    <div class="row"><span>Recebido no mês</span><b>${brl(recebido)}</b></div>
+    <div class="row big"><span>Saldo após todas as contas</span><b class="${saldo<0?'neg':'pos'}">${brl(saldo)}</b></div>
+    <div class="row"><span>Disponível agora (recebido − pago)</span><b class="${saldoCaixa<0?'neg':''}">${brl(saldoCaixa)}</b></div>`;
+
+  $('recebs').innerHTML = recs.map(r=> r.fixo
+    ? `<div class="item"><button class="t" data-f="${r.id}"><span class="n">${esc(r.nome)}</span><small><span class="tag">fixo</span>toque para editar</small></button><span class="v pos">${brl(r.valor)}</span></div>`
+    : `<div class="item"><span class="t"><span class="n">${esc(r.nome)}</span></span><span class="v pos">${brl(r.valor)}</span><button class="x" data-r="${r.i}" aria-label="Remover recebimento">×</button></div>`).join('')
+    || '<div class="empty">Nenhum recebimento neste mês.</div>';
+
+  const listaVisivel = catFiltro
+    ? lista.filter(({it}) => (it.cat||'Sem categoria').toLowerCase() === catFiltro.toLowerCase())
+    : lista;
+
+  let html = '';
+  if (catFiltro){
+    const cm = getCatMeta(catFiltro==='Sem categoria'?'':catFiltro);
+    html += `<div class="filter-pill"><span>Filtrando: <b>${cm.ico} ${esc(cm.nome)}</b></span><button type="button" id="limparFiltro">Mostrar todas ✕</button></div>`;
+  }
+
+  if (!listaVisivel.length){
+    html += '<h2>Contas do mês</h2><div class="empty">'+(catFiltro?'Nenhuma conta nesta categoria neste mês.':'Nenhuma conta neste mês. Toque em “+ Nova conta”.')+'</div>';
+  }
+  let ult = null;
+  html += listaVisivel.map(({it,info})=>{
+    const cab = it.dia!==ult ? `<h2>Vence dia ${it.dia}</h2>` : ''; ult = it.dia;
+    const ok = !!(it.pagos||{})[mes];
+    const cm = getCatMeta(it.cat);
+    let tags = `<span class="tag">dia ${it.dia}</span>`;
+    if (it.cat) tags += `<span class="tag" style="background:${cm.cor}26;color:var(--ink);border:1px solid ${cm.cor}66">${cm.ico} ${esc(it.cat)}</span>`;
+    if (it.tipo==='fixa') tags += '<span class="tag">fixa</span>';
+    if (it.tipo==='parcelada') tags += `<span class="tag">parcela ${info.atual}/${it.total}</span><span class="tag">${info.faltam===0?'última parcela':'faltam '+info.faltam}</span>`;
+    return cab + `<div class="item ${ok?'done':''} ${ok?'':alertaCls(it)}" style="border-left:5px solid ${cm.cor}">
+      <input type="checkbox" data-p="${it.id}" ${ok?'checked':''} aria-label="Marcar ${esc(it.nome)} como pago">
+      <div class="cat-ico" style="background:${cm.cor}22;border:1px solid ${cm.cor}55" aria-hidden="true">${cm.ico}</div>
+      <button class="t" data-e="${it.id}"><span class="n">${esc(it.nome)}</span><small>${tags}</small></button>
+      <span class="v">${brl(it.valor)}</span></div>`;
+  }).join('');
+  $('lista').innerHTML = html;
+  if ($('limparFiltro')) $('limparFiltro').onclick = ()=>{ catFiltro=null; render(); };
+
+  renderExtras(lista);
+}
+
+/* eventos */
+$('prev').onclick = ()=>{ mes=addMes(mes,-1); catFiltro=null; render() };
+$('next').onclick = ()=>{ mes=addMes(mes,1); catFiltro=null; render() };
+
+$('lista').addEventListener('change', e=>{
+  const id = e.target.dataset.p; if(!id) return;
+  const it = id==='__meta' ? db.meta : db.itens.find(x=>x.id===id); it.pagos = it.pagos||{};
+  if (e.target.checked) it.pagos[mes]=true; else delete it.pagos[mes];
+  save(); render();
+});
+$('lista').addEventListener('click', e=>{
+  const b = e.target.closest('[data-e]'); if (b) { b.dataset.e==='__meta' ? abrirMeta() : abrir(b.dataset.e); }
+});
+
+$('rAdd').onclick = ()=>{
+  const v = num($('rValor').value); if(!v) return $('rValor').focus();
+  const nome = $('rNome').value.trim()||'Recebimento';
+  if ($('rFixo').checked) db.recFixos.push({id:Date.now().toString(36),nome,valor:v,de:mes,ate:null});
+  else (db.receb[mes] = db.receb[mes]||[]).push({nome,valor:v});
+  $('rFixo').checked = false;
+  $('rNome').value=''; $('rValor').value=''; save(); render();
+};
+$('recebs').addEventListener('click', e=>{
+  const i = e.target.dataset.r; if(i===undefined) return;
+  db.receb[mes].splice(i,1); save(); render();
+});
+
+const dlg = $('dlg');
+function hint(){
+  if ($('fTipo').value!=='parcelada') return;
+  const t=+$('fTotal').value||0, p=+$('fPagas').value||0;
+  const atual=p+1, falt=t-atual;
+  $('parcHint').textContent = falt<0 ? 'As parcelas pagas não podem passar do total.'
+    : `Neste mês será a parcela ${atual}/${t}. Depois dela faltam ${falt}.`;
+}
+$('fTipo').onchange = ()=>{ $('parcBox').hidden = $('fTipo').value!=='parcelada'; hint() };
+$('fTotal').oninput = $('fPagas').oninput = hint;
+
+$('fNome').addEventListener('input', ()=>{
+  if (catManual && $('fCat').value) return;
+  const sug = sugerirCategoriaPorNome($('fNome').value);
+  const hintEl = $('catSugHint');
+  if (sug){
+    fillCats(sug);
+    const cm = getCatMeta(sug);
+    hintEl.textContent = `Sugestão automática: ${cm.ico} ${sug}`;
+    hintEl.style.display = 'block';
+  } else {
+    hintEl.style.display = 'none';
+  }
+});
+$('fCat').addEventListener('change', ()=>{
+  catManual = true;
+  $('catSugHint').style.display = 'none';
+});
+
+function abrir(id){
+  editId = id || null;
+  const it = id ? db.itens.find(x=>x.id===id) : null;
+  catManual = !!(it && it.cat);
+  $('catSugHint').style.display = 'none';
+  $('dlgTitulo').textContent = it ? 'Editar conta' : 'Nova conta';
+  $('fNome').value = it ? it.nome : '';
+  $('fValor').value = it ? String(it.valor).replace('.',',') : '';
+  $('fDia').value = it ? it.dia : 15;
+  $('fMes').value = it ? it.mes : mes;
+  $('fTipo').value = it ? it.tipo : 'unica';
+  fillCats(it ? it.cat : '');
+  $('fTotal').value = it && it.total ? it.total : 2;
+  $('fPagas').value = it ? (it.pagasAntes||0) : 0;
+  $('parcBox').hidden = $('fTipo').value!=='parcelada';
+  $('excluir').hidden = !it;
+  $('msg').textContent=''; $('excluir').dataset.sure=''; $('excluir').textContent='Excluir';
+  hint(); dlg.showModal();
+}
+$('novo').onclick = ()=>abrir();
+$('cancelar').onclick = ()=>dlg.close();
+
+function salvar(){
+  const msg = t => { $('msg').textContent = t; return false };
+  const tipo = $('fTipo').value, total=+$('fTotal').value, pagas=+$('fPagas').value;
+  if (!$('fNome').value.trim()) return msg('Informe o nome da conta.');
+  if (!num($('fValor').value)) return msg('Informe o valor da conta.');
+  if (!$('fMes').value) return msg('Informe o mês de vencimento.');
+  if (tipo==='parcelada' && (total<2 || pagas<0 || pagas>=total)) return msg('Confira as parcelas: as já pagas devem ser menores que o total.');
+  let catEscolhida = $('fCat').value;
+  if (!catEscolhida) catEscolhida = sugerirCategoriaPorNome($('fNome').value) || '';
+  const dados = {
+    nome:$('fNome').value.trim(), valor:num($('fValor').value),
+    dia:Math.min(31,Math.max(1,+$('fDia').value||1)), mes:$('fMes').value, tipo,
+    cat: catEscolhida, total: tipo==='parcelada'?total:0, pagasAntes: tipo==='parcelada'?pagas:0
+  };
+  if (editId){ Object.assign(db.itens.find(x=>x.id===editId), dados) }
+  else db.itens.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6), pagos:{}, ...dados});
+  save(); dlg.close(); render();
+}
+$('salvar').onclick = salvar;
+$('form').addEventListener('submit', e=>{ e.preventDefault(); salvar() });
+$('excluir').onclick = ()=>{
+  if (!$('excluir').dataset.sure){ $('excluir').dataset.sure='1'; $('excluir').textContent='Toque de novo para excluir'; return; }
+  db.itens = db.itens.filter(x=>x.id!==editId); save(); dlg.close(); render();
+};
+
+/* ---- categorias ---- */
+const CATS=['Moradia','Transporte','Alimentação','Lazer','Faculdade','Cartão de crédito','Contas','Outros'];
+function fillCats(cur){
+  const l=[]; [...CATS,...db.cats,...db.itens.map(i=>i.cat),cur].forEach(c=>{ if(c && !l.some(x=>x.toLowerCase()===c.toLowerCase())) l.push(c); });
+  $('fCat').innerHTML='<option value="">Sem categoria</option>'+l.map(c=>{
+    const cm = getCatMeta(c);
+    return `<option value="${esc(c)}">${cm.ico} ${esc(c)}</option>`;
+  }).join('');
+  const match = l.find(x=>cur && x.toLowerCase()===cur.toLowerCase());
+  $('fCat').value = match || cur || '';
+}
+$('fCatAdd').onclick=()=>{
+  const c=$('fCatNova').value.trim(); if(!c) return $('fCatNova').focus();
+  const ex=[...CATS,...db.cats].find(x=>x.toLowerCase()===c.toLowerCase());
+  if(!ex) db.cats.push(c); save(); fillCats(ex||c); $('fCatNova').value=''; catManual=true;
+};
+
+/* ---- recebimentos fixos ---- */
+function recsDoMes(m){
+  const v=(db.receb[m]||[]).map((r,i)=>({...r,i}));
+  const f=db.recFixos.filter(x=>m>=x.de&&(!x.ate||m<=x.ate)).map(x=>({nome:x.nome,valor:x.valor,fixo:1,id:x.id}));
+  return f.concat(v);
+}
+let editF=null;
+$('recebs').addEventListener('click', e=>{
+  const b=e.target.closest('[data-f]'); if(!b) return;
+  editF=b.dataset.f; const f=db.recFixos.find(x=>x.id===editF); if(!f) return;
+  $('eNome').value=f.nome; $('eVal').value=String(f.valor).replace('.',',');
+  $('eHint').textContent=`Vale a partir de ${nomeMes(mes)}. Meses anteriores não mudam.`;
+  $('dlgR').showModal();
+});
+$('eCan').onclick=()=>$('dlgR').close();
+$('eDel').onclick=()=>{
+  const f=db.recFixos.find(x=>x.id===editF);
+  if(f){ if(f.de>=mes) db.recFixos=db.recFixos.filter(x=>x.id!==editF); else f.ate=addMes(mes,-1); }
+  save(); $('dlgR').close(); render();
+};
+$('eSave').onclick=()=>{
+  const f=db.recFixos.find(x=>x.id===editF), v=num($('eVal').value), nome=$('eNome').value.trim()||'Recebimento';
+  if(!f||!v) return;
+  if(f.de>=mes){ f.nome=nome; f.valor=v; }
+  else { f.ate=addMes(mes,-1); db.recFixos.push({id:Date.now().toString(36),nome,valor:v,de:mes,ate:null}); }
+  save(); $('dlgR').close(); render();
+};
+
+/* ---- meta de poupança ---- */
+function metaItem(m){
+  const mt=db.meta; if(!mt||!mt.mensal||m<mt.inicio) return null;
+  return {id:'__meta',nome:`🐷 Meta: ${mt.nome||'Poupança'}`,valor:mt.mensal,dia:mt.dia||5,cat:'Poupança',tipo:'fixa',pagos:mt.pagos};
+}
+function renderMeta(){
+  const mt=db.meta;
+  if(!mt){ $('metaBox').innerHTML=`<div class="row"><span>🐷 Meta de poupança</span><button class="add" id="mCriar" style="padding:6px 12px">Definir meta</button></div>`; $('mCriar').onclick=abrirMeta; return; }
+  const mesesPagos=Object.keys(mt.pagos||{}).filter(k=>mt.pagos[k]).length;
+  const extras=(mt.extras||[]).reduce((s,x)=>s+x.valor,0);
+  const guardado=mesesPagos*(mt.mensal||0)+extras;
+  const falta=Math.max(0,(mt.alvo||0)-guardado);
+  const pct=mt.alvo?Math.min(100,Math.round(guardado/mt.alvo*100)):0;
+  const mesesRest=mt.mensal?Math.ceil(falta/mt.mensal):0;
+  $('metaBox').innerHTML=`
+    <div class="row"><span>🐷 <b>${esc(mt.nome||'Meta')}</b></span><button class="add" id="mEdit" style="padding:4px 10px;font-size:.82rem">Editar</button></div>
+    <div class="row"><span>Guardado</span><b class="pos">${brl(guardado)} de ${brl(mt.alvo||0)} (${pct}%)</b></div>
+    <div class="bar"><i style="width:${pct}%"></i></div>
+    <div class="row"><small style="color:var(--mut)">${falta<=0?'🎉 Meta atingida!':`Faltam ${brl(falta)} (~${mesesRest} ${mesesRest===1?'mês':'meses'} guardando ${brl(mt.mensal)}/mês)`}</small></div>`;
+  $('mEdit').onclick=abrirMeta;
+}
+function abrirMeta(){
+  const mt=db.meta||{};
+  $('mNome').value=mt.nome||''; $('mAlvo').value=mt.alvo?String(mt.alvo).replace('.',','):'';
+  $('mMensal').value=mt.mensal?String(mt.mensal).replace('.',','):''; $('mInicio').value=mt.inicio||mes;
+  $('xNome').value=''; $('xVal').value=''; $('xMes').value=mes; $('mMsg').textContent='';
+  $('mDel').hidden=!db.meta; renderExtrasMeta(); $('dlgM').showModal();
+}
+function renderExtrasMeta(){
+  const ex=(db.meta&&db.meta.extras)||[];
+  $('xLista').innerHTML=ex.map((x,i)=>`<div class="item" style="margin-top:6px"><span class="t"><span class="n">${esc(x.nome)}</span><small>${nomeMes(x.mes)}</small></span><span class="v pos">${brl(x.valor)}</span><button type="button" class="x" data-x="${i}">×</button></div>`).join('');
+}
+$('mCan').onclick=()=>$('dlgM').close();
+$('mSave').onclick=()=>{
+  const alvo=num($('mAlvo').value), mensal=num($('mMensal').value);
+  if(!alvo||!mensal){ $('mMsg').textContent='Informe o valor-alvo e quanto guardar por mês.'; return; }
+  db.meta=Object.assign(db.meta||{pagos:{},extras:[]},{nome:$('mNome').value.trim()||'Poupança',alvo,mensal,inicio:$('mInicio').value||mes});
+  save(); $('dlgM').close(); render();
+};
+$('mDel').onclick=()=>{ db.meta=null; save(); $('dlgM').close(); render(); };
+$('xAdd').onclick=()=>{
+  const v=num($('xVal').value); if(!v) return;
+  if(!db.meta) db.meta={nome:$('mNome').value.trim()||'Poupança',alvo:num($('mAlvo').value)||v,mensal:num($('mMensal').value)||0,inicio:$('mInicio').value||mes,pagos:{},extras:[]};
+  db.meta.extras.push({nome:$('xNome').value.trim()||'Aporte extra',valor:v,mes:$('xMes').value||mes});
+  $('xNome').value=''; $('xVal').value=''; save(); renderExtrasMeta(); render();
+};
+$('xLista').addEventListener('click',e=>{
+  const i=e.target.dataset.x; if(i===undefined) return;
+  db.meta.extras.splice(+i,1); save(); renderExtrasMeta(); render();
+});
+
+/* ---- Comparativo, Alertas, Gráfico de Rosca Interativo e Resumo Anual ---- */
+function cmpTxt(total){
+  const ant = itensDoMes(addMes(mes,-1)).reduce((s,x)=>s+x.it.valor,0);
+  if (!ant || !total) return '';
+  const dif = total - ant;
+  if (Math.abs(dif) < 0.01) return `<div class="row"><small style="color:var(--mut)">Igual ao mês passado</small></div>`;
+  return `<div class="row"><small style="color:var(--mut)">${dif>0?'▲ '+brl(dif)+' a mais':'▼ '+brl(-dif)+' a menos'} que no mês passado</small></div>`;
+}
+
+function alertaCls(it){
+  const hj = hoje(); if (mes !== hj) return '';
+  const diaHj = new Date().getDate();
+  if (it.dia < diaHj) return 'late';
+  if (it.dia - diaHj <= 3) return 'soon';
+  return '';
+}
+
+function renderDonutCategorias(lista){
+  if (!lista.length){ $('cats').innerHTML=''; return; }
+  const tot = {};
+  let somaTotal = 0;
+  lista.forEach(({it})=>{
+    const c = it.cat || 'Sem categoria';
+    tot[c] = (tot[c]||0) + it.valor;
+    somaTotal += it.valor;
+  });
+  if (!somaTotal){ $('cats').innerHTML=''; return; }
+
+  const entradas = Object.entries(tot).sort((a,b)=>b[1]-a[1]);
+  const r = 74, circ = 2 * Math.PI * r;
+  let acum = 0;
+
+  const fatiasSvg = entradas.map(([catKey, val])=>{
+    const pct = val / somaTotal;
+    const len = pct * circ;
+    const offset = -acum * circ;
+    acum += pct;
+    const cm = getCatMeta(catKey==='Sem categoria'?'':catKey);
+    const ativo = catFiltro && catFiltro.toLowerCase()===catKey.toLowerCase();
+    const opaco = catFiltro && !ativo ? 'opacity:.28' : '';
+    return `<circle class="donut-slice ${ativo?'active':''}" data-cat="${esc(catKey)}" cx="100" cy="100" r="${r}" stroke="${cm.cor}" stroke-dasharray="${len} ${circ}" stroke-dashoffset="${offset}" style="${opaco}"/>`;
+  }).join('');
+
+  const itensLegenda = entradas.map(([catKey, val])=>{
+    const pct = Math.round(val / somaTotal * 100);
+    const cm = getCatMeta(catKey==='Sem categoria'?'':catKey);
+    const ativo = catFiltro && catFiltro.toLowerCase()===catKey.toLowerCase();
+    return `<button type="button" class="leg-item ${ativo?'active':''}" data-cat="${esc(catKey)}">
+      <span class="leg-left"><i class="leg-dot" style="background:${cm.cor}"></i><span>${cm.ico} ${esc(cm.nome)}</span></span>
+      <span class="leg-val">${brl(val)} (${pct}%)</span>
+    </button>`;
+  }).join('');
+
+  let centroTitulo = 'Total do mês', centroValor = brl(somaTotal);
+  if (catFiltro){
+    const par = entradas.find(([k])=>k.toLowerCase()===catFiltro.toLowerCase());
+    if (par){
+      const cm = getCatMeta(par[0]==='Sem categoria'?'':par[0]);
+      centroTitulo = `${cm.ico} ${cm.nome}`;
+      centroValor = brl(par[1]);
     }
+  }
 
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    let audioCtx;
-
-    function playSound(type) {
-      if (state.muted) return;
-      if (!audioCtx) audioCtx = new AudioCtx();
-      const now = audioCtx.currentTime;
-
-      const notes = type === "levelup" ? [440, 554.37, 659.25, 880] : [330, 440];
-      notes.forEach((freq, idx) => {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.type = "triangle";
-        osc.frequency.setValueAtTime(freq, now + idx * 0.07);
-        gain.gain.setValueAtTime(0.12, now + idx * 0.07);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + (idx + 1) * 0.15);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start(now + idx * 0.07);
-        osc.stop(now + (idx + 1) * 0.15);
-      });
-    }
-
-    function toggleMute() {
-      state.muted = !state.muted;
-      document.getElementById("mute-btn").innerText = state.muted ? "🔇" : "🔊";
-      saveState();
-    }
-
-    // ================= PIXEL ART REFINADA (ESTILO INDIE COZY) =================
-    function getRefinedCatPixelArt(level) {
-      const hasSword = level >= 3;
-      const isMage = level >= 6;
-
-      return `
-      <svg viewBox="0 0 32 32" width="100%" height="100%" shape-rendering="crispEdges">
-        <!-- Espada nas costas (Nível 3+) -->
-        ${hasSword ? `
-          <path d="M6 8 L9 5 L11 7 L8 10 Z" fill="#ffd700"/>
-          <path d="M8 9 L15 18 L17 16 L10 7 Z" fill="#60a5fa"/>
-        ` : ''}
-
-        <!-- Capa do Mago (Nível 6+) -->
-        ${isMage ? `
-          <path d="M9 16 L23 16 L25 26 L7 26 Z" fill="#a855f7"/>
-        ` : ''}
-
-        <!-- Corpo e Orelhas do Gato (Pixel Art Orgânica) -->
-        <path d="M10 11 L7 6 L12 9 Z" fill="#312e81"/>
-        <path d="M22 11 L25 6 L20 9 Z" fill="#312e81"/>
-        <!-- Orelhas internas rosadas -->
-        <path d="M9.5 9.5 L8 7.5 L10.5 8.5 Z" fill="#f472b6"/>
-        <path d="M22.5 9.5 L24 7.5 L21.5 8.5 Z" fill="#f472b6"/>
-
-        <!-- Cabeça Fofa -->
-        <rect x="9" y="9" width="14" height="11" rx="2" fill="#312e81"/>
-
-        <!-- Gorro / Coroa do Mago Supremo (Nível 6+) -->
-        ${isMage ? `
-          <path d="M13 5 L19 5 L16 2 Z" fill="#fbbf24"/>
-          <rect x="11" y="8" width="10" height="2" fill="#7c3aed"/>
-        ` : ''}
-
-        <!-- Olhos Brilhantes -->
-        <rect x="11" y="13" width="2" height="3" fill="#fbbf24"/>
-        <rect x="19" y="13" width="2" height="3" fill="#fbbf24"/>
-        <!-- Focinho -->
-        <rect x="15" y="16" width="2" height="1" fill="#f472b6"/>
-
-        <!-- Torso e Patas -->
-        <rect x="11" y="20" width="10" height="8" fill="#312e81"/>
-        <rect x="12" y="28" width="3" height="2" fill="#ffffff"/>
-        <rect x="17" y="28" width="3" height="2" fill="#ffffff"/>
-
-        <!-- Escudo Mágico (Nível 3+) -->
-        ${hasSword ? `
-          <path d="M21 19 L26 21 L26 25 L21 27 L19 23 Z" fill="#22aaff" stroke="#ffffff" stroke-width="0.5"/>
-        ` : ''}
-      </svg>`;
-    }
-
-    function getRefinedMonsterPixelArt(isBoss) {
-      if (isBoss) {
-        // Boss Dragão/Golem Vermelho em Pixel Art Detalhada
-        return `
-        <svg viewBox="0 0 32 32" width="100%" height="100%" shape-rendering="crispEdges">
-          <path d="M10 6 L14 4 L18 4 L22 6 L24 10 L24 22 L8 22 L8 10 Z" fill="#ef4444"/>
-          <path d="M6 12 L8 10 L8 18 L6 16 Z" fill="#991b1b"/>
-          <path d="M26 12 L24 10 L24 18 L26 16 Z" fill="#991b1b"/>
-          <rect x="11" y="11" width="3" height="3" fill="#fbbf24"/>
-          <rect x="18" y="11" width="3" height="3" fill="#fbbf24"/>
-          <path d="M12 18 L16 20 L20 18" stroke="#fff" stroke-width="1.5" fill="none"/>
-        </svg>`;
-      }
-      // Slime Verde em Pixel Art Fofa
-      return `
-      <svg viewBox="0 0 32 32" width="100%" height="100%" shape-rendering="crispEdges">
-        <path d="M10 16 C10 10, 22 10, 22 16 C22 22, 22 24, 10 24 Z" fill="#10b981"/>
-        <rect x="12" y="15" width="2" height="3" fill="#000"/>
-        <rect x="18" y="15" width="2" height="3" fill="#000"/>
-        <rect x="13" y="14" width="1" height="1" fill="#fff"/>
-      </svg>`;
-    }
-
-    function getRefinedDecorPixelArt(type, level) {
-      if (level <= 0) return "";
-      const colors = ["#ffcc00", "#22aaff", "#a855f7", "#ef4444"];
-      const col = colors[(level - 1) % colors.length];
-
-      if (type === "campfire") {
-        return `
-        <svg viewBox="0 0 32 32" width="48" height="48" shape-rendering="crispEdges">
-          <path d="M14 12 L18 12 L17 20 L15 20 Z" fill="${col}"/>
-          <path d="M16 8 L18 13 L14 13 Z" fill="#fff"/>
-          <rect x="10" y="21" width="12" height="4" fill="#78350f" rx="1"/>
-        </svg>
-        <span class="item-lvl-tag">Nv.${level}</span>`;
-      }
-      if (type === "chest") {
-        return `
-        <svg viewBox="0 0 32 32" width="48" height="48" shape-rendering="crispEdges">
-          <rect x="7" y="12" width="18" height="12" fill="#92400e" rx="1"/>
-          <rect x="7" y="16" width="18" height="3" fill="${col}"/>
-          <rect x="14" y="16" width="4" height="4" fill="#fbbf24"/>
-        </svg>
-        <span class="item-lvl-tag">Nv.${level}</span>`;
-      }
-    }
-
-    // ================= LÓGICA DO JOGO =================
-    function gainXPAndGold(xpAmount, goldAmount, btnEl, isCrit = false) {
-      if (state.elixirCharges > 0) {
-        xpAmount *= 2;
-        state.elixirCharges--;
-      }
-
-      state.xp += xpAmount;
-      state.gold += goldAmount;
-
-      if (btnEl) {
-        const rect = btnEl.getBoundingClientRect();
-        const floatEl = document.createElement("div");
-        floatEl.className = "floating-text";
-        floatEl.style.left = `${rect.left}px`;
-        floatEl.style.top = `${rect.top - 10}px`;
-        floatEl.innerHTML = `${isCrit ? '⚡ CRÍTICO! ' : ''}+${xpAmount} XP | +${goldAmount} 🪙`;
-        document.body.appendChild(floatEl);
-        setTimeout(() => floatEl.remove(), 1000);
-      }
-
-      const xpNeeded = state.level * 100;
-      if (state.xp >= xpNeeded) {
-        state.xp -= xpNeeded;
-        state.level++;
-        playSound("levelup");
-        setSpeech(`🎉 LEVEL UP! Nível ${state.level} alcançado! Meus equipamentos evoluíram!`);
-      } else {
-        playSound("hit");
-      }
-
-      saveState();
-    }
-
-    function setSpeech(msg) {
-      document.getElementById("guardian-speech").innerText = `"${msg}"`;
-    }
-
-    function addBill() {
-      const name = document.getElementById("bill-name").value.trim();
-      const amount = parseFloat(document.getElementById("bill-amount").value);
-      const due = document.getElementById("bill-due").value;
-
-      if (!name || isNaN(amount) || amount <= 0) {
-        return setSpeech("Preencha o nome e o valor da conta!");
-      }
-
-      state.bills.push({
-        id: Date.now(),
-        name,
-        amount,
-        due: due || new Date().toISOString().split("T")[0],
-        paid: false
-      });
-
-      document.getElementById("bill-name").value = "";
-      document.getElementById("bill-amount").value = "";
-      setSpeech(`Novo monstro "${name}" invocado na masmorra!`);
-      saveState();
-    }
-
-    function payBill(id, btnEl) {
-      const bill = state.bills.find(b => b.id === id);
-      if (!bill || bill.paid) return;
-
-      const card = document.getElementById(`bill-card-${id}`);
-      card.classList.add("hit-anim");
-
-      const today = new Date().toISOString().split("T")[0];
-      const isEarly = bill.due >= today;
-
-      setTimeout(() => {
-        bill.paid = true;
-        setSpeech(isEarly ? `⚡ ACERTO CRÍTICO em "${bill.name}"! Conta paga em dia com XP em dobro!` : `Boleto "${bill.name}" derrotado!`);
-        gainXPAndGold(isEarly ? 80 : 40, isEarly ? 35 : 15, btnEl, isEarly);
-      }, 350);
-    }
-
-    function upgradeForge(key) {
-      const item = state.forge[key];
-      const cost = item.baseCost * (item.level + 1);
-      if (state.gold < cost) return setSpeech(`Faltam moedas! Você precisa de ${cost} 🪙.`);
-
-      state.gold -= cost;
-      item.level++;
-      playSound("levelup");
-      setSpeech(`⚒️ "${item.name}" aprimorado para o Nível ${item.level}!`);
-      saveState();
-    }
-
-    function buyElixir() {
-      if (state.gold < 80) return setSpeech("Você precisa de 80 🪙 para o Elixir!");
-      state.gold -= 80;
-      state.elixirCharges += 3;
-      playSound("hit");
-      setSpeech("🧪 Elixir ativo! Próximas 3 contas darão o dobro de XP.");
-      saveState();
-    }
-
-    function buyHeal() {
-      if (state.gold < 60) return setSpeech("Você precisa de 60 🪙 para a Poção!");
-      state.gold -= 60;
-      state.hpBonus = Math.min(100, (state.hpBonus || 0) + 25);
-      playSound("hit");
-      setSpeech("❤️ HP do orçamento restaurado com sucesso!");
-      saveState();
-    }
-
-    function rollGacha() {
-      if (state.gold < 150) return setSpeech("Você precisa de 150 🪙 para abrir o Baú!");
-      state.gold -= 150;
-
-      const rewards = [
-        { title: "Mestre dos Boletos [Raro]", aura: "rgba(34, 170, 255, 0.3)" },
-        { title: "Lorde do Cashback [Épico]", aura: "rgba(168, 85, 247, 0.35)" },
-        { title: "Oráculo de Riqueza [Lendário]", aura: "rgba(255, 204, 0, 0.4)" }
-      ];
-      const won = rewards[Math.floor(Math.random() * rewards.length)];
-      state.nobleTitle = won.title;
-      state.auraColor = won.aura;
-      playSound("levelup");
-      setSpeech(`🎁 GACHA! Novo título desbloqueado: "${won.title}"!`);
-      saveState();
-    }
-
-    function updateFinanceConfig() {
-      const val = parseFloat(document.getElementById("input-budget").value);
-      if (val > 0) {
-        state.budget = val;
-        saveState();
-      }
-    }
-
-    function addManaSavings() {
-      const val = parseFloat(document.getElementById("input-mana-add").value);
-      if (isNaN(val) || val <= 0) return;
-      state.manaSaved += val;
-      document.getElementById("input-mana-add").value = "";
-      setSpeech(`💧 R$ ${val} guardados na reserva! MP recarregada.`);
-      gainXPAndGold(60, 25, null);
-    }
-
-    function renderAll() {
-      const xpNeeded = state.level * 100;
-      document.getElementById("lvl-text").innerText = `LVL ${state.level}`;
-      document.getElementById("xp-text").innerText = `${state.xp}/${xpNeeded} XP`;
-      document.getElementById("xp-bar").style.width = `${Math.min(100, (state.xp / xpNeeded) * 100)}%`;
-      document.getElementById("gold-text").innerText = state.gold;
-      document.getElementById("elixir-indicator").innerText = state.elixirCharges > 0 ? `⚡ 2x XP (${state.elixirCharges}x)` : "";
-
-      const totalBills = state.bills.reduce((acc, b) => acc + b.amount, 0);
-      const rawHp = Math.max(0, Math.round(((state.budget - totalBills) / state.budget) * 100));
-      const finalHp = Math.min(100, rawHp + (state.hpBonus || 0));
-      document.getElementById("hp-text").innerText = `${finalHp}%`;
-      document.getElementById("hp-bar").style.width = `${finalHp}%`;
-
-      document.getElementById("mp-text").innerText = `R$ ${state.manaSaved}`;
-      document.getElementById("mp-bar").style.width = `${Math.min(100, (state.manaSaved / 2000) * 100)}%`;
-
-      let className = "Classe: Gato Aprendiz";
-      if (state.level >= 3 && state.level < 6) className = "Classe: Gato Guerreiro ⚔️";
-      if (state.level >= 6) className = "Classe: Gato Mago Supremo 👑";
-      document.getElementById("class-title").innerText = className;
-      document.getElementById("noble-title").innerText = state.nobleTitle;
-
-      document.getElementById("ambient-aura").style.background = state.auraColor;
-      document.getElementById("guardian-pixel-art").innerHTML = getRefinedCatPixelArt(state.level);
-
-      document.getElementById("slot-campfire").innerHTML = getRefinedDecorPixelArt("campfire", state.forge.campfire.level);
-      document.getElementById("slot-chest").innerHTML = getRefinedDecorPixelArt("chest", state.forge.chest.level);
-
-      const pending = state.bills.filter(b => !b.paid);
-      const maxVal = pending.length ? Math.max(...pending.map(b => b.amount)) : 0;
-      const listEl = document.getElementById("monsters-list");
-
-      if (pending.length === 0) {
-        listEl.innerHTML = `<p style="text-align: center; color: var(--green-xp); font-family: 'Press Start 2P'; font-size: 9px; padding: 16px;">🎉 Masmorra limpa! Contas zeradas!</p>`;
-      } else {
-        listEl.innerHTML = pending.map(bill => {
-          const isBoss = bill.amount === maxVal && pending.length > 1;
-          return `
-            <div class="monster-row ${isBoss ? 'boss' : ''}" id="bill-card-${bill.id}">
-              <div style="display: flex; align-items: center; gap: 12px; flex: 1;">
-                <div class="monster-avatar">${getRefinedMonsterPixelArt(isBoss)}</div>
-                <div style="flex: 1;">
-                  ${isBoss ? '<span class="boss-tag">🔥 Boss da Masmorra</span><br>' : ''}
-                  <strong style="font-size: 16px;">${bill.name}</strong>
-                  <div style="color: #9ca3af; font-size: 13px;">Vencimento: ${bill.due} | Valor: <strong style="color: var(--gold);">R$ ${bill.amount.toFixed(2)}</strong></div>
-                </div>
-              </div>
-              <button class="btn-rpg btn-action" onclick="payBill(${bill.id}, this)">⚔️ Atacar</button>
-            </div>
-          `;
-        }).join("");
-      }
-
-      document.getElementById("forge-list").innerHTML = Object.keys(state.forge).map(key => {
-        const item = state.forge[key];
-        const cost = item.baseCost * (item.level + 1);
-        return `
-          <div class="shop-card">
-            <div>
-              <strong class="pixel-title" style="font-size: 9px; color: var(--gold);">${item.name} (Nv.${item.level})</strong>
-              <p style="font-size: 13px; color: #9ca3af; margin-top: 4px;">Aprimora o visual no santuário.</p>
-            </div>
-            <button class="btn-rpg btn-gold" onclick="upgradeForge('${key}')">
-              ${item.level === 0 ? 'Comprar' : 'Aprimorar'} (${cost} 🪙)
-            </button>
+  $('cats').innerHTML = `<section class="sum">
+    <details open>
+      <summary>Gastos por categoria <small style="color:var(--mut);font-weight:400">(toque na fatia para filtrar)</small></summary>
+      <div class="donut-wrap" style="margin-top:12px">
+        <div class="donut-box">
+          <svg class="donut-svg" viewBox="0 0 200 200">${fatiasSvg}</svg>
+          <div class="donut-center">
+            <small>${esc(centroTitulo)}</small>
+            <b>${centroValor}</b>
           </div>
-        `;
-      }).join("");
+        </div>
+        <div class="leg-grid">${itensLegenda}</div>
+      </div>
+    </details>
+  </section>`;
 
-      document.getElementById("input-budget").value = state.budget;
+  $('cats').querySelectorAll('[data-cat]').forEach(el=>{
+    el.onclick = ()=>{
+      const clicada = el.dataset.cat;
+      catFiltro = (catFiltro && catFiltro.toLowerCase()===clicada.toLowerCase()) ? null : clicada;
+      render();
+    };
+  });
+}
+
+function renderExtras(lista){
+  renderMeta();
+  renderDonutCategorias(lista);
+
+  const hj = hoje();
+  if (mes === hj){
+    const d = new Date().getDate();
+    const atr = lista.filter(({it})=>!(it.pagos||{})[mes] && it.dia < d);
+    const prx = lista.filter(({it})=>!(it.pagos||{})[mes] && it.dia >= d && it.dia - d <= 3);
+    let a = '';
+    if (atr.length) a += `<div class="alerta r">⚠️ ${atr.length} ${atr.length===1?'conta atrasada':'contas atrasadas'} neste mês!</div>`;
+    if (prx.length) a += `<div class="alerta">⏰ ${prx.length} ${prx.length===1?'conta vence':'contas vencem'} nos próximos 3 dias.</div>`;
+    $('alerta').innerHTML = a;
+  } else $('alerta').innerHTML = '';
+
+  const anoAtual = mes.split('-')[0];
+  let rows = '';
+  for (let m=1; m<=12; m++){
+    const mm = `${anoAtual}-${String(m).padStart(2,'0')}`;
+    const t = itensDoMes(mm).reduce((s,x)=>s+x.it.valor,0);
+    const r = recsDoMes(mm).reduce((s,x)=>s+x.valor,0);
+    if (t || r) rows += `<div class="row"><span>${nomeMes(mm)}</span><b>${brl(t)} <small class="${r-t<0?'neg':'pos'}">(saldo ${brl(r-t)})</small></b></div>`;
+  }
+  $('ano').innerHTML = rows ? `<section class="sum" style="margin-top:16px"><details><summary>Visão de ${anoAtual}</summary><div style="margin-top:8px">${rows}</div></details></section>` : '';
+}
+
+/* ---- Backup Exportar / Importar ---- */
+$('bExp').onclick = ()=>{
+  const blob = new Blob([JSON.stringify(db,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `contas-backup-${hoje()}.json`;
+  a.click();
+  $('bMsg').textContent = 'Backup exportado com sucesso!';
+};
+$('bImp').onclick = ()=>$('bFile').click();
+$('bFile').onchange = e=>{
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ev=>{
+    try { db = norm(JSON.parse(ev.target.result)); save(); render(); $('bMsg').textContent='Backup restaurado com sucesso!'; }
+    catch(err){ $('bMsg').textContent='Arquivo inválido.'; }
+  };
+  r.readAsText(f);
+};
+
+/* =========================================================================
+   CONSELHEIRO FINANCEIRO INTELIGENTE (ANÁLISE REAL DAS CONTAS + IA OPCIONAL)
+   ========================================================================= */
+const dlgChat = $('dlgChat');
+
+function coletarRaioXMes(){
+  const lista = itensDoMes(mes);
+  const recs  = recsDoMes(mes);
+  const recebido = recs.reduce((s,r)=>s+r.valor,0);
+  const total = lista.reduce((s,x)=>s+x.it.valor,0);
+  const pago  = lista.filter(x=>(x.it.pagos||{})[mes]).reduce((s,x)=>s+x.it.valor,0);
+  const falta = total - pago;
+  const saldoProjetado = recebido - total;
+  const disponivelAgora = recebido - pago;
+
+  const pendentes = lista.filter(x=>!(x.it.pagos||{})[mes]).sort((a,b)=>b.it.valor - a.it.valor);
+  const parceladas = lista.filter(x=>x.it.tipo==='parcelada');
+  const hj = hoje();
+  const diaHj = new Date().getDate();
+  const atrasadas = mes===hj ? pendentes.filter(x=>x.it.dia < diaHj) : [];
+  const vencendoLogo = mes===hj ? pendentes.filter(x=>x.it.dia >= diaHj && x.it.dia - diaHj <= 3) : [];
+
+  const porCat = {};
+  lista.forEach(({it})=>{
+    const c = it.cat || 'Sem categoria';
+    porCat[c] = (porCat[c]||0) + it.valor;
+  });
+  const rankingCats = Object.entries(porCat).sort((a,b)=>b[1]-a[1]);
+
+  // Verifica fôlego do mês seguinte (parcelas que acabam neste mês)
+  const acabamEsteMes = parceladas.filter(x=>x.info.faltam === 0);
+  const alivioProxMes = acabamEsteMes.reduce((s,x)=>s+x.it.valor,0);
+
+  return { lista, recs, recebido, total, pago, falta, saldoProjetado, disponivelAgora, pendentes, parceladas, atrasadas, vencendoLogo, rankingCats, acabamEsteMes, alivioProxMes };
+}
+
+function gerarRespostaConsultorLocal(pergunta){
+  const q = pergunta.toLowerCase();
+  const rx = coletarRaioXMes();
+
+  if (!rx.lista.length && !rx.recebido){
+    return `Ainda não há contas nem recebimentos lançados em <b>${nomeMes(mes)}</b>. Cadastre suas contas e seu salário para eu traçar um plano de ação personalizado!`;
+  }
+
+  // 1. Pergunta sobre PRIORIDADES / DÍVIDAS / O QUE PAGAR PRIMEIRO
+  if (q.includes('prioriz') || q.includes('primeiro') || q.includes('dívida') || q.includes('divida') || q.includes('atras')){
+    let resp = `<b>🎯 Ordem de Prioridade para ${nomeMes(mes)}:</b><ul>`;
+    if (rx.atrasadas.length){
+      const nomesAtr = rx.atrasadas.map(x=>`<b>${esc(x.it.nome)}</b> (${brl(x.it.valor)}, venceu dia ${x.it.dia})`).join(', ');
+      resp += `<li>🚨 <b>Urgência Máxima (Em atraso):</b> Quite imediatamente ${nomesAtr} para estancar multas e juros diários.</li>`;
     }
-
-    function switchTab(tab) {
-      ["dungeon", "tavern", "stats"].forEach(t => {
-        document.getElementById(`tab-${t}`).classList.toggle("hidden", t !== tab);
-        document.getElementById(`tab-btn-${t}`).classList.toggle("active", t === tab);
-      });
+    if (rx.vencendoLogo.length){
+      const nomesLogo = rx.vencendoLogo.map(x=>`<b>${esc(x.it.nome)}</b> (dia ${x.it.dia} - ${brl(x.it.valor)})`).join(', ');
+      resp += `<li>⏰ <b>Vencendo nos próximos 3 dias:</b> Separe o valor de ${nomesLogo}.</li>`;
     }
-
-    function devBoost() {
-      gainXPAndGold(120, 250, document.querySelector(".dev-footer"), true);
+    const cartoesPendentes = rx.pendentes.filter(x=>(x.it.cat||'').toLowerCase().includes('cart'));
+    if (cartoesPendentes.length){
+      const maiorCartao = cartoesPendentes[0].it;
+      resp += `<li>💳 <b>Cuidado com Juros Rotativos:</b> Você tem <b>${esc(maiorCartao.nome)}</b> (${brl(maiorCartao.valor)}) em aberto. Priorize o pagamento integral da fatura antes de qualquer gasto variável, pois o rotativo do cartão passa de 400% ao ano.</li>`;
     }
-
-    function resetGame() {
-      localStorage.removeItem("cozy_pixel_rpg_state");
-      state = JSON.parse(JSON.stringify(defaultState));
-      renderAll();
+    if (rx.pendentes.length){
+      const maior = rx.pendentes[0].it;
+      resp += `<li>📌 <b>Maior peso pendente:</b> Sua conta mais pesada em aberto é <b>${esc(maior.nome)}</b> (${brl(maior.valor)}, dia ${maior.dia}).</li>`;
+    } else {
+      resp += `<li>✅ <b>Parabéns!</b> Todas as contas de ${nomeMes(mes)} já estão marcadas como pagas!</li>`;
     }
+    resp += `</ul>`;
+    return resp;
+  }
 
-    renderAll();
-  </script>
+  // 2. Pergunta sobre PARCELAS / ANTECIPAÇÃO
+  if (q.includes('parcela') || q.includes('antecip')){
+    if (!rx.parceladas.length){
+      return `Você não tem nenhuma conta parcelada ativa em <b>${nomeMes(mes)}</b>. Isso é excelente para manter seu fluxo de caixa livre nos próximos meses!`;
+    }
+    const somaParc = rx.parceladas.reduce((s,x)=>s+x.it.valor,0);
+    const pctParc = rx.total ? Math.round(somaParc/rx.total*100) : 0;
+    let resp = `<b>💳 Raio-X das suas Parcelas (${brl(somaParc)} • ${pctParc}% das saídas):</b><ul>`;
+    rx.parceladas.forEach(({it, info})=>{
+      resp += `<li><b>${esc(it.nome)}</b>: ${brl(it.valor)} (Parcela ${info.atual}/${it.total} — ${info.faltam===0?'<b>acaba neste mês! 🎉</b>':'faltam '+info.faltam+' após este mês'})</li>`;
+    });
+    resp += `</ul>`;
+    if (rx.alivioProxMes > 0){
+      resp += `<p style="margin-top:6px">💡 <b>Boa notícia:</b> Como ${rx.acabamEsteMes.length===1?'uma conta parcelada termina':'algumas parcelas terminam'} neste mês, no mês que vem você terá um <b>alívio automático de ${brl(rx.alivioProxMes)}</b> no orçamento! Evite assumir novas parcelas agora para sentir essa folga no bolso.</p>`;
+    } else {
+      resp += `<p style="margin-top:6px">💡 <b>Dica de Ouro:</b> Se tiver algum dinheiro extra, verifique no app do banco (como Nubank ou Itaú) se há desconto para antecipar as últimas parcelas da menor dívida (Método Bola de Neve). Assim você elimina uma linha fixa do mês seguinte.</p>`;
+    }
+    return resp;
+  }
+
+  // 3. Pergunta sobre ONDE CORTAR GASTOS / ECONOMIZAR
+  if (q.includes('cortar') || q.includes('economiz') || q.includes('reduz') || q.includes('gasto') || q.includes('corte')){
+    const [topCat, topVal] = rx.rankingCats[0] || ['Sem categoria', 0];
+    const pctTop = rx.total ? Math.round(topVal/rx.total*100) : 0;
+    const lazerVal = (rx.rankingCats.find(([k])=>k==='Lazer')||[0,0])[1];
+    const alimVal  = (rx.rankingCats.find(([k])=>k==='Alimentação')||[0,0])[1];
+    const contVal  = (rx.rankingCats.find(([k])=>k==='Contas')||[0,0])[1];
+
+    let resp = `<b>✂️ Plano de Otimização de Gastos (${nomeMes(mes)}):</b><ul>`;
+    resp += `<li>📊 <b>Seu maior foco de saída:</b> A categoria <b>${esc(topCat)}</b> consome <b>${brl(topVal)} (${pctTop}% do total)</b>.</li>`;
+    if (lazerVal > 0 || alimVal > 0){
+      resp += `<li>🍽️🎮 <b>Gastos Flexíveis (Alimentação + Lazer):</b> Somam <b>${brl(lazerVal + alimVal)}</b>. Reduzir apenas 20% em entregas/saídas já libera <b>${brl((lazerVal + alimVal)*0.2)}</b> no seu caixa imediatamente.</li>`;
+    }
+    if (contVal > 0){
+      resp += `<li>📱 <b>Revisão de Assinaturas e Contas (${brl(contVal)}):</b> Verifique se há planos de celular/internet ou streamings que você pouco usa e que podem ser renegociados.</li>`;
+    }
+    resp += `<li>🎯 <b>Regra Prática:</b> Tente travar um teto semanal para gastos variáveis. Quando pagamos todas as contas e deixamos o saldo solto na conta-corrente, ele some em pequenos gastos invisíveis.</li></ul>`;
+    return resp;
+  }
+
+  // 4. Pergunta sobre LAZER / QUANTO POSSO GASTAR
+  if (q.includes('lazer') || q.includes('posso gastar') || q.includes('sobra') || q.includes('livre')){
+    if (rx.recebido <= 0){
+      return `Para eu calcular seu limite seguro de lazer, inclua primeiro seus <b>Recebimentos</b> (salário/bolsa) ali na tela principal! Por enquanto suas contas somam <b>${brl(rx.total)}</b>.`;
+    }
+    if (rx.saldoProjetado < 0){
+      return `⚠️ <b>Atenção máxima:</b> Neste mês suas contas (${brl(rx.total)}) superam seus recebimentos (${brl(rx.recebido)}) em <b>${brl(Math.abs(rx.saldoProjetado))}</b>. O momento pede <b>custo zero em compras extras</b> até reequilibrar o mês.`;
+    }
+    const reservaSugerida = rx.meta ? 0 : rx.saldoProjetado * 0.3;
+    const livreSeguro = Math.max(0, rx.saldoProjetado - reservaSugerida);
+    const porFimDeSemana = livreSeguro / 4;
+    return `<b>🎮 Margem Segura para Lazer em ${nomeMes(mes)}:</b><ul>
+      <li><b>Sobra prevista após quitar tudo:</b> <span class="pos"><b>${brl(rx.saldoProjetado)}</b></span></li>
+      <li><b>Disponível em caixa hoje (Recebido − Pago):</b> ${brl(rx.disponivelAgora)} (mas lembre-se que ainda faltam pagar <b>${brl(rx.falta)}</b> em contas!).</li>
+      <li>💡 <b>Recomendação do Conselheiro:</b> Separando uma margem de segurança para imprevistos, você pode usar até <b>${brl(livreSeguro)}</b> no mês (cerca de <b>${brl(porFimDeSemana)} por fim de semana</b>) sem comprometer nenhuma conta!</li>
+    </ul>`;
+  }
+
+  // 5. DIAGNÓSTICO COMPLETO DO MÊS (Padrão)
+  const [topCat, topVal] = rx.rankingCats[0] || ['Geral', 0];
+  const taxaComprometimento = rx.recebido ? Math.round(rx.total / rx.recebido * 100) : null;
+
+  let diag = `<b>📊 Diagnóstico Financeiro — ${nomeMes(mes)}</b><ul>`;
+  diag += `<li><b>Total de contas:</b> ${brl(rx.total)} (${brl(rx.pago)} já pagos • faltam <b>${brl(rx.falta)}</b>)</li>`;
+  if (rx.recebido > 0){
+    diag += `<li><b>Renda comprometida:</b> <b>${taxaComprometimento}%</b> dos seus recebimentos (${brl(rx.recebido)}) vão para as contas cadastradas.</li>`;
+    diag += `<li><b>Saldo final previsto:</b> <b class="${rx.saldoProjetado<0?'neg':'pos'}">${brl(rx.saldoProjetado)}</b></li>`;
+  } else {
+    diag += `<li>💡 <i>Dica: Cadastre seu salário em "Recebimentos" para eu calcular sua sobra real.</i></li>`;
+  }
+  diag += `<li><b>Maior categoria:</b> ${esc(topCat)} (${brl(topVal)})</li>`;
+  if (rx.alivioProxMes > 0){
+    diag += `<li>🎉 <b>Fôlego chegando:</b> ${brl(rx.alivioProxMes)} em parcelas terminam neste mês!</li>`;
+  }
+  diag += `</ul>`;
+
+  if (rx.saldoProjetado < 0 && rx.recebido > 0){
+    diag += `<p style="margin-top:6px">⚠️ <b>Ação recomendada:</b> Seu mês está fechado no negativo em ${brl(Math.abs(rx.saldoProjetado))}. Toque em <i>"Onde cortar gastos?"</i> aqui embaixo para vermos onde ajustar.</p>`;
+  } else if (taxaComprometimento !== null && taxaComprometimento > 80){
+    diag += `<p style="margin-top:6px">⚡ <b>Alerta de Margem Curta:</b> Mais de 80% da sua renda já está comprometida. Evite novos parcelamentos neste mês.</p>`;
+  } else if (rx.recebido > 0){
+    diag += `<p style="margin-top:6px">✅ <b>Saúde Financeira Estável:</b> Suas contas cabem dentro da sua renda mensal. Priorize pagar as pendentes antes do vencimento e direcione parte da sobra (${brl(rx.saldoProjetado)}) para sua Meta/Reserva!</p>`;
+  }
+  return diag;
+}
+
+async function consultarGeminiAPI(pergunta, apiKey){
+  const rx = coletarRaioXMes();
+  const resumoContas = rx.lista.map(({it, info}) =>
+    `- ${it.nome}: R$ ${it.valor.toFixed(2)} | Venc: dia ${it.dia} | Cat: ${it.cat||'Sem cat'} | Tipo: ${it.tipo}${it.tipo==='parcelada'?` (${info.atual}/${it.total})`:''} | Status: ${(it.pagos||{})[mes]?'PAGO':'PENDENTE'}`
+  ).join('\n');
+
+  const promptSistema = `Você é um planejador e conselheiro financeiro pessoal experiente, empático, direto e prático no Brasil.
+Analise os dados reais do usuário referentes ao mês ${nomeMes(mes)}:
+- Recebimentos totais do mês: R$ ${rx.recebido.toFixed(2)}
+- Total de contas do mês: R$ ${rx.total.toFixed(2)} (Já pago: R$ ${rx.pago.toFixed(2)} | Falta pagar: R$ ${rx.falta.toFixed(2)})
+- Saldo após pagar tudo: R$ ${rx.saldoProjetado.toFixed(2)}
+- Meta de poupança cadastrada: ${db.meta ? `${db.meta.nome} (Guardar R$ ${db.meta.mensal}/mês para alvo de R$ ${db.meta.alvo})` : 'Nenhuma'}
+Lista detalhada de contas deste mês:
+${resumoContas || 'Nenhuma conta cadastrada.'}
+
+Responda à pergunta do usuário em português de forma clara, objetiva (máximo 3 parágrafos curtos ou tópicos diretos), citando os nomes e valores reais das contas dele quando fizer sentido.
+Pergunta do usuário: "${pergunta}"`;
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ contents: [{ parts: [{ text: promptSistema }] }] })
+  });
+  if (!res.ok) throw new Error('Falha na chave da API');
+  const data = await res.json();
+  const txt = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  return txt
+    .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n\* /g, '<br>• ')
+    .replace(/\n- /g, '<br>• ');
+}
+
+function addMsgChat(html, quem){
+  const box = $('chatMsgs');
+  const div = document.createElement('div');
+  div.className = `msg-bub ${quem==='usr'?'msg-usr':'msg-adv'}`;
+  div.innerHTML = html;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+  return div;
+}
+
+async function enviarPerguntaConselheiro(texto){
+  const p = String(texto||'').trim();
+  if (!p) return;
+  addMsgChat(esc(p), 'usr');
+  $('chatInput').value = '';
+
+  const apiKey = localStorage.getItem(KEY_API) || '';
+  if (apiKey){
+    const loadBub = addMsgChat('<i>Analisando suas contas com IA...</i>', 'adv');
+    try {
+      const respIA = await consultarGeminiAPI(p, apiKey);
+      loadBub.innerHTML = respIA;
+      return;
+    } catch(e){
+      loadBub.innerHTML = gerarRespostaConsultorLocal(p) + `<br><small style="color:var(--mut)">(Respondido pelo motor analítico local — verifique sua API Key em ⚙️ IA)</small>`;
+      return;
+    }
+  }
+
+  setTimeout(()=>{
+    addMsgChat(gerarRespostaConsultorLocal(p), 'adv');
+  }, 220);
+}
+
+$('btnConselheiro').onclick = ()=>{
+  $('advMesNome').textContent = nomeMes(mes);
+  $('inpApiKey').value = localStorage.getItem(KEY_API) || '';
+  if (!$('chatMsgs').children.length){
+    addMsgChat(`Olá! Sou seu <b>Conselheiro Financeiro</b>. Já li todas as suas contas e recebimentos de <b>${nomeMes(mes)}</b>.<br><br>` + gerarRespostaConsultorLocal('Diagnóstico completo do meu mês'), 'adv');
+  }
+  dlgChat.showModal();
+};
+
+$('btnFecharChat').onclick = ()=>dlgChat.close();
+$('btnToggleApi').onclick = ()=>{ $('boxApiCfg').hidden = !$('boxApiCfg').hidden; };
+$('btnSaveKey').onclick = ()=>{
+  const k = $('inpApiKey').value.trim();
+  if (k) localStorage.setItem(KEY_API, k);
+  else localStorage.removeItem(KEY_API);
+  $('boxApiCfg').hidden = true;
+  addMsgChat(k ? '✅ Chave de IA salva! Suas próximas perguntas usarão o Gemini AI conectado às suas contas.' : 'Modo Analítico Local 100% gratuito ativado.', 'adv');
+};
+
+$('formChat').addEventListener('submit', e=>{
+  e.preventDefault();
+  enviarPerguntaConselheiro($('chatInput').value);
+});
+
+document.querySelectorAll('.chip-q').forEach(btn=>{
+  btn.onclick = ()=>enviarPerguntaConselheiro(btn.dataset.q);
+});
+
+render();
+</script>
 </body>
 </html>
